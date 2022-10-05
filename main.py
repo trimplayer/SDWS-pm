@@ -1,5 +1,6 @@
 from values import *
 from sympy import *
+from func import ser
 
 n = 1
 e = symbols('e')
@@ -33,4 +34,5 @@ for i in range(n+1):
         sub_ser += ((I*e*f)**j/factorial(j)) * duuu[i][j]
     dus = dus.subs(duu[i], sub_ser)
 
-simplify(dus)
+dus = ser(dus, n+1)
+
