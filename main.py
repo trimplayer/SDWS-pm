@@ -1,6 +1,5 @@
 from values import *
 from sympy import *
-from sympy.polys.ring_series import rs_series
 from func import ser
 
 n = 1
@@ -37,7 +36,7 @@ dus = ser(dus, n+1)
 d2uu = []
 
 for i in range(n+1):
-    d2uu.append(symbols('dus' + str(i)))\
+    d2uu.append(symbols('dus' + str(i)))
 
 d2us = Float(0)
 for i in range(n+1):
@@ -63,3 +62,22 @@ hm = hm.removeO()
 cr = e * d2f / h ** 3
 cr = cr.series(e, n=n+1)
 cr = cr.removeO()
+
+sigmass0 = symbols('sigmass0')
+Ms = symbols("Ms")
+sigmas0 = symbols("sigmas0")
+
+rhs1 = (sigmass0 * cr + Ms * cr * re(dus) + sigmas0 * im(d2us * expoa)) - I * (Ms * re(d2us * expoa)) - sigmas0 * cr * im(dus)
+rhs1 = ser(rhs1, n+1)
+
+out_file = open("rhs1.txt","w")
+out_file.write(str(rhs1))
+out_file.close()
+pprint(rhs1)
+print()
+
+# expr read test
+in_file = open("rhs1.txt","r")
+frexpr = in_file.read()
+rhsn = parse_expr(frexpr)
+pprint(rhsn)

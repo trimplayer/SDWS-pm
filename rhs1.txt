@@ -1,0 +1,1 @@
+-I*Ms*re(dus01) + e*(Ms*d2f*re(dus00) + Ms*d2f*re(dus10)*re(e) - Ms*d2f*re(e)*im(dus01*f) - Ms*d2f*re(dus01*f)*im(e) - Ms*d2f*im(dus10)*im(e) - d2f*sigmas0*re(dus10)*im(e) - d2f*sigmas0*re(e)*re(dus01*f) - d2f*sigmas0*re(e)*im(dus10) - d2f*sigmas0*im(dus00) + d2f*sigmas0*im(e)*im(dus01*f) + d2f*sigmass0) + sigmas0*im(dus01)
