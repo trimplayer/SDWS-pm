@@ -1,6 +1,7 @@
 from values import *
 from sympy import *
 from func import ser
+import temp
 
 n = 1
 e = symbols('e')
