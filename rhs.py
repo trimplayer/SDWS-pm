@@ -1,7 +1,6 @@
 from values import *
 from sympy import *
 from func import ser
-import temp
 
 n = 1
 e = symbols('e')
@@ -74,11 +73,4 @@ rhs1 = ser(rhs1, n+1)
 out_file = open("rhs1.txt","w")
 out_file.write(str(rhs1))
 out_file.close()
-pprint(rhs1)
-print()
 
-# expr read test
-in_file = open("rhs1.txt","r")
-frexpr = in_file.read()
-rhsn = parse_expr(frexpr)
-pprint(rhsn)
