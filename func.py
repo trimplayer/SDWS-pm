@@ -2,7 +2,7 @@ import sympy
 
 
 def ser(expr, m):
-    e = sympy.symbols('e')
+    e = sympy.symbols('e', real=True)
 
     eq = sympy.expand(expr)
     eq = sympy.collect(eq,e)

@@ -3,10 +3,10 @@ from sympy import *
 from func import ser
 
 n = 1
-e = symbols('e')
-f = symbols('f')
-df = symbols('df')
-d2f = symbols('d2f')
+e = symbols('e', real=True)
+f = symbols('f', real=True)
+df = symbols('df', real=True)
+d2f = symbols('d2f', real=True)
 
 duu = []
 
@@ -67,7 +67,7 @@ sigmass0 = symbols('sigmass0')
 Ms = symbols("Ms")
 sigmas0 = symbols("sigmas0")
 
-rhs1 = (sigmass0 * cr + Ms * cr * re(dus) + sigmas0 * im(d2us * expoa)) - I * (Ms * re(d2us * expoa)) - sigmas0 * cr * im(dus)
+rhs1 = (sigmass0 * cr + Ms * cr * re(dus) + sigmas0 * im(d2us * expoa)) - I * (Ms * re(d2us * expoa) - sigmas0 * cr * im(dus))
 rhs1 = ser(rhs1, n+1)
 
 out_file = open("rhs1.txt","w")

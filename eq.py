@@ -3,8 +3,10 @@ from sympy import *
 from func import ser
 
 n = 1
-e = symbols('e')
-f = symbols('f')
+e = symbols('e', real=True)
+f = symbols('f', real=True)
+df = symbols('df', real=True)
+d2f = symbols('d2f', real=True)
 
 
 phip1i1 = IndexedBase('Phip1_i_1')
@@ -49,4 +51,22 @@ Upsilonp11 = ser(Upsilonp11, n+1)
 out_file = open("Upsilon1p1.txt","w")
 out_file.write(str(Upsilonp11))
 out_file.close()
+
+expoa = 1 - 2*I*e*df/(1+I*e*df)
+expoa = expoa.series(e, n=n+1)
+expoa = expoa.removeO()
+
+in_file = open("rhs1.txt","r")
+frexpr1 = in_file.read()
+in_file.close()
+rhs1 = parse_expr(frexpr1)
+
+w1 = symbols('w1')
+x = symbols('x')
+
+eqp1 = phip11 + conjugate(phip11) - (Upsilonp11 + conjugate(phip11)) - (w1 - conjugate(w1)) * conjugate(dphip11) * expoa - rhs1
+eqp1 = eqp1.subs(w1,x+I*e*f)
+
+eqp1 = ser(eqp1, n+1)
+
 
