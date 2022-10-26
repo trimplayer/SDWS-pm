@@ -7,6 +7,7 @@ e = symbols('e', real=True)
 f = symbols('f', real=True)
 df = symbols('df', real=True)
 d2f = symbols('d2f', real=True)
+dict = {'e' : e, 'f' : f, 'df' : df, 'd2f' : d2f}
 
 
 phip1i1 = IndexedBase('Phip1_i_1')
@@ -44,7 +45,7 @@ i,j = symbols('i j', cls=Idx)
 Upsilonp11 = Sum(e**i/factorial(i) * Upsilonp1i1[i], (i,0,n)).doit()
 
 for i in range(n+1):
-    Upsilonp11 = Upsilonp11.subs(Upsilonp1i1[i], Sum((I*e*f)**j / factorial(j) * Upsilonp1ij1[i, j],(j,0,n)).doit())
+    Upsilonp11 = Upsilonp11.subs(Upsilonp1i1[i], Sum((-I*e*f)**j / factorial(j) * Upsilonp1ij1[i, j],(j,0,n)).doit())
 
 Upsilonp11 = ser(Upsilonp11, n+1)
 
@@ -59,14 +60,24 @@ expoa = expoa.removeO()
 in_file = open("rhs1.txt","r")
 frexpr1 = in_file.read()
 in_file.close()
-rhs1 = parse_expr(frexpr1)
+rhs1 = parse_expr(frexpr1, local_dict=dict)
 
 w1 = symbols('w1')
-x = symbols('x')
+x = symbols('x', real=True)
 
-eqp1 = phip11 + conjugate(phip11) - (Upsilonp11 + conjugate(phip11)) - (w1 - conjugate(w1)) * conjugate(dphip11) * expoa - rhs1
-eqp1 = eqp1.subs(w1,x+I*e*f)
+eqq1 = phip11 + conjugate(phip11) - (Upsilonp11 + conjugate(phip11) - (w1 - conjugate(w1)) * conjugate(dphip11)) * expoa - rhs1
+eqq1 = eqq1.subs(w1,x+I*e*f)
 
-eqp1 = ser(eqp1, n+1)
+eqq1 = ser(eqq1, n+1)
 
 
+
+eqq1l =[]
+for l in range(n+1):
+    eqq1l.append(eqq1.coeff(e, l))
+
+eqq11 = eqq1l[1]
+
+out_file = open("eqq11.txt","w")
+out_file.write(str(eqq11))
+out_file.close()

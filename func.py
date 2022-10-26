@@ -5,7 +5,7 @@ def ser(expr, m):
     e = sympy.symbols('e', real=True)
 
     eq = sympy.expand(expr)
-    eq = sympy.collect(eq,e)
+    eq = sympy.collect(eq, e)
 
     ret = sympy.Float(0)
     for j in range(m):
