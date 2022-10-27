@@ -1,1 +1,1 @@
-e*(I*f*Upsilon_p1_ij_1[0, 1] + Upsilon_p1_ij_1[1, 0]) + Upsilon_p1_ij_1[0, 0]
+e*(-I*f*Upsilon_p1_ij_1[0, 1] + Upsilon_p1_ij_1[1, 0]) + Upsilon_p1_ij_1[0, 0]
