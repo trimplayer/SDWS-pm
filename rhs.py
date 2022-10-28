@@ -8,45 +8,24 @@ f = symbols('f', real=True)
 df = symbols('df', real=True)
 d2f = symbols('d2f', real=True)
 
-duu = []
+dusi = IndexedBase("dus_i")
+dusij = IndexedBase("du_s")
+i, j = symbols('i j', cls=Idx)
 
-for i in range(n+1):
-    duu.append(symbols('dus' + str(i)))
+dus = Sum((e ** i / factorial(i)) * dusi[i], (i, 0, n)).doit()
 
-dus = Float(0)
-for i in range(n+1):
-    dus += (e**i/factorial(i)) * duu[i]
+for k in range(n + 1):
+    dus = dus.subs(dusi[k], Sum(((I * e * f) ** j / factorial(j)) * dusij[k, j], (j, 0, n)).doit())
 
-duuu = []
-for i in range(n+1):
-    duu1 = []
-    for j in range(n+2):
-        duu1.append(symbols('dus' + str(i) + str(j)))
-    duuu.append(duu1)
+dus = ser(dus,n+1)
 
 
-for i in range(n+1):
-    sub_ser = Float(0)
-    for j in range(n+1):
-        sub_ser += ((I*e*f)**j/factorial(j)) * duuu[i][j]
-    dus = dus.subs(duu[i], sub_ser)
+d2usi = IndexedBase("dus_i")
 
-dus = ser(dus, n+1)
+d2us = Sum((e**i/factorial(i)) * d2usi[i],(i,0,n)).doit()
 
-d2uu = []
-
-for i in range(n+1):
-    d2uu.append(symbols('dus' + str(i)))
-
-d2us = Float(0)
-for i in range(n+1):
-    d2us += (e**i/factorial(i)) * d2uu[i]
-
-for i in range(n+1):
-    sub_ser = Float(0)
-    for j in range(n+1):
-        sub_ser += ((I*e*f)**j/factorial(j)) * duuu[i][j+1]
-    d2us = d2us.subs(d2uu[i], sub_ser)
+for k in range(n + 1):
+    d2us = d2us.subs(d2usi[k],Sum(((I*e*f)**j/factorial(j)) * dusij[k, j+1], (j,0,n)).doit())
 
 d2us = ser(d2us, n+1)
 
@@ -73,4 +52,3 @@ rhs1 = ser(rhs1, n+1)
 out_file = open("rhs1.txt","w")
 out_file.write(str(rhs1))
 out_file.close()
-
