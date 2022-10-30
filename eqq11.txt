@@ -1,1 +1,0 @@
--Ms*d2f*re(dus00) - I*Ms*df*im(dus01) - I*Ms*f*im(dus02) + I*Ms*re(dus11) - I*d2f*sigmas0*im(dus00) - d2f*sigmass0 - df*sigmas0*re(dus01) + 2*I*df*conjugate(Phi_p1_ij_1[0, 0]) + 2*I*df*Upsilon_p1_ij_1[0, 0] - f*sigmas0*re(dus02) + 2*I*f*conjugate(Phi_p1_ij_1[0, 1]) + I*f*Phi_p1_ij_1[0, 1] + I*f*Upsilon_p1_ij_1[0, 1] - sigmas0*im(dus11) + Phi_p1_ij_1[1, 0] - Upsilon_p1_ij_1[1, 0]

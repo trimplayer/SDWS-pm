@@ -12,3 +12,8 @@ def ser(expr, m):
         ret += eq.coeff(e, j)*e**j
 
     return ret
+
+
+
+
+

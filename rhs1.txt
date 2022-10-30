@@ -1,1 +1,0 @@
--I*Ms*re(du_s[0, 1]) + e*(Ms*d2f*re(du_s[0, 0]) + I*Ms*df*im(du_s[0, 1]) + I*Ms*f*im(du_s[0, 2]) - I*Ms*re(du_s[1, 1]) + I*d2f*sigmas0*im(du_s[0, 0]) + d2f*sigmass0 + df*sigmas0*re(du_s[0, 1]) + f*sigmas0*re(du_s[0, 2]) + sigmas0*im(du_s[1, 1])) + sigmas0*im(du_s[0, 1])

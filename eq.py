@@ -1,17 +1,18 @@
 from values import *
 from sympy import *
-from func import ser
+from func import *
+import pickle
 
 n = 1
 e = symbols('e', real=True)
 f = symbols('f', real=True)
 df = symbols('df', real=True)
 d2f = symbols('d2f', real=True)
-dict = {'e' : e, 'f' : f, 'df' : df, 'd2f' : d2f}
+d = {'e' : e, 'f' : f, 'df' : df, 'd2f' : d2f}
 
 
 phip1i1 = IndexedBase('Phip1_i_1')
-phip1ij1 = IndexedBase('Phi_p1_ij_1')
+phip1ij1 = IndexedBase('Phi_p1_1')
 i,j = symbols('i j', cls=Idx)
 
 phip11 = Sum(e**i/factorial(i) * phip1i1[i], (i,0,n)).doit()
@@ -21,8 +22,8 @@ for i in range(n+1):
 
 phip11 = ser(phip11, n+1)
 
-out_file = open("phi1p1.txt","w")
-out_file.write(str(phip11))
+out_file = open("phi1p1","wb")
+pickle.dump(phip11,out_file)
 out_file.close()
 
 dphip1i1 = IndexedBase('dPhip1_i_1')
@@ -34,12 +35,12 @@ for i in range(n+1):
 
 dphip11 = ser(dphip11, n+1)
 
-out_file = open("dphi1p1.txt","w")
-out_file.write(str(dphip11))
+out_file = open("dphi1p1","wb")
+pickle.dump(dphip11, out_file)
 out_file.close()
 
 Upsilonp1i1 = IndexedBase('Upsilonp1_i_1')
-Upsilonp1ij1 = IndexedBase('Upsilon_p1_ij_1')
+Upsilonp1ij1 = IndexedBase('Upsilon_p1_1')
 i,j = symbols('i j', cls=Idx)
 
 Upsilonp11 = Sum(e**i/factorial(i) * Upsilonp1i1[i], (i,0,n)).doit()
@@ -49,18 +50,17 @@ for i in range(n+1):
 
 Upsilonp11 = ser(Upsilonp11, n+1)
 
-out_file = open("Upsilon1p1.txt","w")
-out_file.write(str(Upsilonp11))
+out_file = open("Upsilon1p1","wb")
+pickle.dump(Upsilonp11, out_file)
 out_file.close()
 
 expoa = 1 - 2*I*e*df/(1+I*e*df)
 expoa = expoa.series(e, n=n+1)
 expoa = expoa.removeO()
 
-in_file = open("rhs1.txt","r")
-frexpr1 = in_file.read()
+in_file = open("rhs1","rb")
+rhs1 = pickle.load(in_file)
 in_file.close()
-rhs1 = parse_expr(frexpr1, local_dict=dict)
 
 w1 = symbols('w1')
 x = symbols('x', real=True)
@@ -78,6 +78,6 @@ for l in range(n+1):
 
 eqq11 = eqq1l[1]
 
-out_file = open("eqq11.txt","w")
-out_file.write(str(eqq11))
+out_file = open("eqq11","wb")
+pickle.dump(eqq11, out_file)
 out_file.close()
