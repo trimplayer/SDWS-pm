@@ -87,7 +87,7 @@ reqq11 = collect(reqq11, t)
 
 #  upsilon [1, 0]
 z = symbols('z')
-Upsilon1p1 = Upsilon1p1.subs(Upsilonp1ij1[1, 0], reqq11.coeff(t, 1) * exp(-I*b*z))
+Upsilon1p1 = Upsilon1p1.subs(Upsilonp1ij1[1, 0], reqq11.coeff(t, 1) * exp(I*b*z))
 Upsilon1p1 = Upsilon1p1.subs(subp)
 
 out_file = open("Upsilon1p1N","wb")
