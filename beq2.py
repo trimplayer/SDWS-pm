@@ -18,6 +18,7 @@ dphi1p1 = pickle.load(in_file)
 in_file.close()
 
 
+
 f = symbols('f', real=True)
 df = symbols('df', real=True)
 d2f = symbols('d2f', real=True)
@@ -29,15 +30,20 @@ x = symbols('x', real=True)
 y = symbols('y', real=True)
 z = symbols('z')
 
+
+
 subf = {f:sub_f, df:sub_df, d2f:sub_d2f}
 
 #Upsilon1p1 = Upsilon1p1.subs({z: x-I*y, y:0})  # y = 0
+qs0 = symbols('q_s0', real=True)
 Upsilon1p1 = Upsilon1p1.subs(z, x)
+Upsilon1p1 = Upsilon1p1.subs(qs0, 0)
 
 phi1p1 = phi1p1.subs(z, x)
+phi1p1 = phi1p1.subs(qs0, 0)
 
 dphi1p1 = dphi1p1.subs(z, x)
-
+dphi1p1 = dphi1p1.subs(qs0, 0)
 
 dusi = IndexedBase("dus_i")
 dusij = IndexedBase("du_s")
@@ -77,8 +83,10 @@ eqq4 = 2*mu*dus - (ka+1)*phi1p1 + qs
 eqq4 = eqq4.expand()
 eqq4 = collect(eqq4, e)
 
-qs0 = symbols('q_s0')  ##
-subsi = {dusij[0, 0]: ((ka+1)*T/4-qs0)/(2*mu), dusij[0,1]: 0, dusij[0,2]: 0}
+
+#qs0 = symbols('q_s0', real=True)  ##
+#subsi = {dusij[0, 0]: ((ka+1)*T/4-qs0)/(2*mu), dusij[0,1]: 0, dusij[0,2]: 0}
+subsi = {dusij[0, 0]: ((ka+1)*T/4)/(2*mu), dusij[0,1]: 0, dusij[0,2]: 0}
 
 A = IndexedBase('A', real=True)
 B = IndexedBase('B', real=True)
@@ -101,6 +109,25 @@ eqq41 = eqq41.collect([cos(b*x), sin(b*x)])
 
 cfc12 = eqq41.coeff(cos(b*x))
 cfs12 = eqq41.coeff(sin(b*x))
+
+
+eq1 = re(cfc12)
+#eq2 = -1/2/mu*re(-(ka+1)*b*(-a*(sigmass0*mu+1/8*Ms*(T*ka+T-4*qs0))*b+(-a*T+(I*B[1, 1]+A[1, 1])*Ms+(I*A[1, -1]-B[1, -1])*sigmas0)*mu)+I*im(qs0)*a*b**2*sigmas0+re(qs0)*a*b**2*Ms-2*a*(sigmass0*mu+1/8*Ms*T*(ka+1))*b**2-4*(A[1, 1]+I*A[1, -1])*mu**2)
+eq2 = -1/16/mu*re(-8*((-a*sigmass0*b+(I*B[1, 1]+A[1, 1])*Ms-T*a+sigmas0*(I*A[1, -1]-B[1, -1]))*mu-1/8*a*b*T*Ms*(ka+1))*(ka+1)*b-(I*32*A[1, -1]+32*A[1, 1])*mu**2-16*a*b**2*sigmass0*mu-2*a*b**2*Ms*T*(ka+1))
+print(simplify(eq2-eq1))
+
+eq3 = im(cfc12)
+#eq4 = -1/2/mu*im(-(ka+1)*b*(-a*(sigmass0*mu+1/8*Ms*(T*ka+T-4*qs0))*b+(-a*T+(I*B[1, 1]+A[1, 1])*Ms+(I*A[1, -1]-B[1, -1])*sigmas0)*mu)+I*im(qs0)*a*b**2*sigmas0+re(qs0)*a*b**2*Ms-2*a*(sigmass0*mu+1/8*Ms*T*(ka+1))*b**2-4*(A[1, 1]+I*A[1, -1])*mu**2)
+eq4 = -1/16/mu*im(-8*((-a*sigmass0*b+(I*B[1, 1]+A[1, 1])*Ms-T*a+sigmas0*(I*A[1, -1]-B[1, -1]))*mu-1/8*a*b*T*Ms*(ka+1))*(ka+1)*b-(I*32*A[1, -1]+32*A[1, 1])*mu**2-16*a*b**2*sigmass0*mu-2*a*b**2*Ms*T*(ka+1))
+print(simplify(eq3-eq4))
+
+eq5 = re(cfs12)
+eq6 = 1/2/mu*re(-I*((-a*sigmass0*b+(I*B[1, 1]+A[1, 1])*Ms-T*a+sigmas0*(I*A[1, -1]-B[1, -1]))*mu-1/8*a*b*T*Ms*(ka+1))*(ka+1)*b+4*mu**2*(B[1, 1]+I*B[1, -1]))
+print(simplify(eq5-eq6))
+
+eq7 = im(cfs12)
+eq8 = 1/2/mu*im(-I*((-a*sigmass0*b+(I*B[1, 1]+A[1, 1])*Ms-T*a+sigmas0*(I*A[1, -1]-B[1, -1]))*mu-1/8*a*b*T*Ms*(ka+1))*(ka+1)*b+4*mu**2*(B[1, 1]+I*B[1, -1]))
+print(simplify(eq7-eq8))
 
 out_file = open("cfc12","wb")
 pickle.dump(cfc12, out_file)

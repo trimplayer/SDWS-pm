@@ -90,6 +90,7 @@ z = symbols('z')
 Upsilon1p1 = Upsilon1p1.subs(Upsilonp1ij1[1, 0], reqq11.coeff(t, 1) * exp(I*b*z))
 Upsilon1p1 = Upsilon1p1.subs(subp)
 
+
 out_file = open("Upsilon1p1N","wb")
 pickle.dump(Upsilon1p1, out_file)
 out_file.close()
@@ -104,9 +105,9 @@ out_file = open("phi1p1N","wb")
 pickle.dump(phi1p1,out_file)
 out_file.close()
 
-dphi1p1 = phi1p1.subs(phip1ij1[1,0], subphi)
-dphi1p1 = phi1p1.subs(phip1ij1[1,1], diff(subphi, z))
-dphi1p1 = phi1p1.subs(subp)
+dphi1p1 = dphi1p1.subs(phip1ij1[1,0], subphi)
+dphi1p1 = dphi1p1.subs(phip1ij1[1,1], diff(subphi, z))
+dphi1p1 = dphi1p1.subs(subp)
 
 out_file = open("dphi1p1N","wb")
 pickle.dump(dphi1p1, out_file)
