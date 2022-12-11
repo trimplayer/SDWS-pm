@@ -3,7 +3,7 @@ from sympy import *
 from func import *
 import pickle
 
-n = 1
+n = 2
 e = symbols('e', real=True)
 f = symbols('f', real=True)
 df = symbols('df', real=True)
@@ -49,6 +49,8 @@ sigmas0 = symbols("sigma_s0")
 
 rhs1 = (sigmass0 * cr + Ms * cr * re(dus) + sigmas0 * im(d2us * expoa)) - I * (Ms * re(d2us * expoa) - sigmas0 * cr * im(dus))
 rhs1 = ser(rhs1, n+1)
+
+print(rhs1)
 
 out_file = open("rhs1","wb")
 pickle.dump(rhs1,out_file)

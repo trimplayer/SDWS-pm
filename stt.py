@@ -2,9 +2,11 @@ from values import *
 from sympy import *
 from func import *
 import matplotlib
+from matplotlib import pyplot as plt
+import numpy as np
 import pickle
 
-n = 1
+n = 2
 
 f = symbols('f', real=True)
 df = symbols('df', real=True)
@@ -17,6 +19,7 @@ A = IndexedBase('A', real=True)
 B = IndexedBase('B', real=True)
 
 unkn=[A[1, 1],A[1, (-1)],B[1, 1],B[1, (-1)]]
+unkn2=[A[2, 1],A[2, (-1)],B[2, 1],B[2, (-1)]]
 
 in_file = open("cfc12","rb")
 cfc12 = pickle.load(in_file)
@@ -28,7 +31,9 @@ in_file.close()
 
 eqs = [re(cfc12), im(cfc12), re(cfs12), im(cfs12)]
 
-
+in_file = open("eqslist","rb")
+eqslist = pickle.load(in_file)
+in_file.close()
 
 
 
@@ -52,18 +57,43 @@ par2 = {lam:58.17*10**9, mu:26.13*10**9, Ms:6.099, a:10*10**(-9), T:0.1*10**9,si
 #
 # eqs = [eq2, eq4, eq6, eq8]
 
+#i = 0
+# for ex in eqs:
+#     eqs[i] = ex.subs(par0)
+#     eqs[i] = eqs[i].subs(par1)
+#     #eqs[i] = eqs[i].subs(par1)
+#     eqs[i] = eqs[i].evalf(subs=par2)
+#     #eqs[i] = eqs[i].subs(par2)
+#     i +=1
+#
+#
+# sol = solve(eqs, unkn)
+# subc = sol
+
+eqss = eqslist[3].copy()
 i = 0
-for ex in eqs:
-    eqs[i] = ex.subs(par0)
-    eqs[i] = eqs[i].subs(par1)
-    #eqs[i] = eqs[i].subs(par1)
-    eqs[i] = eqs[i].evalf(subs=par2)
-    #eqs[i] = eqs[i].subs(par2)
+for ex in eqss:
+    eqss[i] = ex.subs(par0)
+    eqss[ i] = eqss[ i].subs(par1)
+    eqss[ i] = eqss[ i].evalf(subs=par2)
+    i += 1
+sol1 = solve(eqss, unkn2)
+subc1 = sol1
+
+i = 0
+eqs0 = [0,0,0,0]
+for ex in eqslist[0]:
+    eqs0[i]=ex
+    eqs0[i] = eqs0[i] + eqslist[2][i]
+    eqs0[i] = eqs0[i].subs(par0)
+    eqs0[i] = eqs0[i].subs(par1)
+    eqs0[i] = eqs0[i].subs(subc1)
+    eqs0[i] = eqs0[i].evalf(subs=par2)
     i +=1
-
-
-sol = solve(eqs, unkn)
+sol = solve(eqs0, unkn)
 subc = sol
+
+subc = subc | subc1
 
 in_file = open("Upsilon1p1N","rb")
 Upsilon1p1 = pickle.load(in_file)
@@ -83,13 +113,20 @@ z = symbols('z')
 
 Upsilon1p1 = Upsilon1p1.subs(z, x)
 Upsilon1p1 = Upsilon1p1.subs(subc)
+
+Upsilon1p1 = Upsilon1p1.subs(subf)
+
 Upsilon1p1 = Upsilon1p1.subs(par0)
 Upsilon1p1 = Upsilon1p1.subs(par1)
 Upsilon1p1 = Upsilon1p1.subs(par2)
 Upsilon1p1 = Upsilon1p1.evalf()  ##
+#print(Upsilon1p1)
 
 phi1p1 = phi1p1.subs(z, x)
 phi1p1 = phi1p1.subs(subc)
+
+phi1p1 = phi1p1.subs(subf)
+
 phi1p1 = phi1p1.subs(par0)
 phi1p1 = phi1p1.subs(par1)
 phi1p1 = phi1p1.subs(par2)
@@ -97,6 +134,9 @@ phi1p1 = phi1p1.evalf()
 
 dphi1p1 = dphi1p1.subs(z, x)
 dphi1p1 = dphi1p1.subs(subc)
+
+dphi1p1 = dphi1p1.subs(subf)
+
 dphi1p1 = dphi1p1.subs(par0)
 dphi1p1 = dphi1p1.subs(par1)
 dphi1p1 = dphi1p1.subs(par2)
@@ -122,7 +162,12 @@ G1 = G1.subs(w1, x+I*e*f)
 
 G1 = ser(G1, n+1)
 
+G1 = G1.subs(subf)  ##
+G1 = G1.subs(b, 2*pi /a)
+G1 = G1.subs(a, 10*10**(-9))
+
 sigma_1nn = re(G1)  #eval
+#print(sigma_1nn)
 
 sigma_1tt_plus_sigma_1nn = re(4*phi1p1)
 
@@ -134,7 +179,22 @@ sigmatt = sigma_1tt
 
 sigmatt = sigmatt.subs(e, 0.1)
 
+
 scf = sigmatt.evalf(subs={x: 0})
 
-plot(sigmatt, (x, -0.5, 0.5))
+plot(sigmatt, (x, -0.5, 0.5, 0.001))
 
+
+x1 = np.arange(-0.5, 0.5, 0.01, dtype=float)
+x2 = np.array([(10**(-9)*re(sigmatt)).subs(x, xi).evalf() for xi in x1])
+#x2 = 10**(-9)*re(sigmatt).subs(x,x1)
+
+# plt.plot(x1, x2)
+# plt.show()
+
+points = np.array([[x1[i], x2[i]] for i in range(len(x1)) ])
+
+plt.plot(points[:, 0], points[:, 1])
+#plt.show()
+
+#np.savetxt("points.csv", points, delimiter=",")

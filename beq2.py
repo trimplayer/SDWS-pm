@@ -3,7 +3,7 @@ from sympy import *
 from func import *
 import pickle
 
-n = 1
+n = 2
 
 in_file = open("Upsilon1p1N","rb")
 Upsilon1p1 = pickle.load(in_file)
@@ -86,18 +86,24 @@ eqq4 = collect(eqq4, e)
 
 #qs0 = symbols('q_s0', real=True)  ##
 #subsi = {dusij[0, 0]: ((ka+1)*T/4-qs0)/(2*mu), dusij[0,1]: 0, dusij[0,2]: 0}
-subsi = {dusij[0, 0]: ((ka+1)*T/4)/(2*mu), dusij[0,1]: 0, dusij[0,2]: 0}
+subsi = {dusij[0, 0]: ((ka+1)*T/4)/(2*mu), dusij[0,1]: 0, dusij[0,2]: 0, dusij[0,3]: 0}
 
 A = IndexedBase('A', real=True)
 B = IndexedBase('B', real=True)
 b = symbols('b', real=True)
 
 sub_dus = (A[1,1] + I*A[1,(-1)])*cos(b*x) + (B[1,1] + I*B[1,(-1)])*sin(b*x)
+sub_dus2 = (A[2,1] + I*A[2,(-1)])*cos(2*b*x) + (B[2,1] + I*B[2,(-1)])*sin(2*b*x)
 subsi[dusij[1,0]] = sub_dus
+subsi[dusij[1,1]] = diff(sub_dus, x)
+subsi[dusij[1,2]] = diff(diff(sub_dus, x), x)
+subsi[dusij[2,0]] = sub_dus2
 
+#eqq41 = eqq4.coeff(e, 1)
 eqq41 = eqq4.coeff(e, 1)
+eqq42 = eqq4.coeff(e, 2)
 
-eqq41 = eqq41.subs(subf)
+eqq41 = eqq41.subs(subf)  ##
 eqq41 = eqq41.subs(subsi)
 #eqq41 = simplify(eqq41)
 eqq41 = eqq41.expand()
@@ -107,9 +113,24 @@ eqq41 = eqq41.subs(exp(-I*b*x), cos(b*x)-I*sin(b*x))
 eqq41 = eqq41.expand()
 eqq41 = eqq41.collect([cos(b*x), sin(b*x)])
 
+eqq42 = eqq42.subs(subf)  ##
+eqq42 = eqq42.subs(subsi)
+#eqq41 = simplify(eqq41)
+eqq42 = eqq42.expand()
+eqq42 = eqq42.subs(exp(I*b*x), 1 / (exp(-I*b*x)))
+eqq42 = eqq42.subs(exp(2*I*b*x), 1 / (exp(-2*I*b*x)))
+
+eqq42 = eqq42.subs(exp(-I*b*x), cos(b*x)-I*sin(b*x))
+eqq42 = eqq42.subs(exp(-2*I*b*x), cos(2*b*x)-I*sin(2*b*x))
+eqq42 = eqq42.expand()
+eqq42 = eqq42.collect([cos(b*x), sin(b*x), cos(2*b*x), sin(2*b*x)])
+
 cfc12 = eqq41.coeff(cos(b*x))
 cfs12 = eqq41.coeff(sin(b*x))
-
+eqs1 = [re(eqq41.coeff(cos(b*x))), im(eqq41.coeff(cos(b*x))), re(eqq41.coeff(sin(b*x))), im(eqq41.coeff(sin(b*x)))]
+eqs12 = [re(eqq41.coeff(cos(2*b*x))), im(eqq41.coeff(cos(2*b*x))), re(eqq41.coeff(sin(2*b*x))), im(eqq41.coeff(sin(2*b*x)))]
+eqs2 = [re(eqq42.coeff(cos(b*x))), im(eqq42.coeff(cos(b*x))), re(eqq42.coeff(sin(b*x))), im(eqq42.coeff(sin(b*x)))]
+eqs22 = [re(eqq42.coeff(cos(2*b*x))), im(eqq42.coeff(cos(2*b*x))), re(eqq42.coeff(sin(2*b*x))), im(eqq42.coeff(sin(2*b*x)))]
 
 eq1 = re(cfc12)
 #eq2 = -1/2/mu*re(-(ka+1)*b*(-a*(sigmass0*mu+1/8*Ms*(T*ka+T-4*qs0))*b+(-a*T+(I*B[1, 1]+A[1, 1])*Ms+(I*A[1, -1]-B[1, -1])*sigmas0)*mu)+I*im(qs0)*a*b**2*sigmas0+re(qs0)*a*b**2*Ms-2*a*(sigmass0*mu+1/8*Ms*T*(ka+1))*b**2-4*(A[1, 1]+I*A[1, -1])*mu**2)
@@ -135,4 +156,10 @@ out_file.close()
 
 out_file = open("cfs12","wb")
 pickle.dump(cfs12, out_file)
+out_file.close()
+
+
+eqslist = [eqs1, eqs12, eqs2, eqs22]
+out_file = open("eqslist","wb")
+pickle.dump(eqslist, out_file)
 out_file.close()

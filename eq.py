@@ -3,7 +3,7 @@ from sympy import *
 from func import *
 import pickle
 
-n = 1
+n = 2
 e = symbols('e', real=True)
 f = symbols('f', real=True)
 df = symbols('df', real=True)
@@ -76,7 +76,8 @@ eqq1l =[]
 for l in range(n+1):
     eqq1l.append(eqq1.coeff(e, l))
 
-eqq11 = eqq1l[1]
+#eqq11 = eqq1l[1]  ##
+eqq11 = eqq1
 
 out_file = open("eqq11","wb")
 pickle.dump(eqq11, out_file)
