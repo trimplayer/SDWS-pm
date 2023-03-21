@@ -21,15 +21,15 @@ B = IndexedBase('B', real=True)
 unkn=[A[1, 1],A[1, (-1)],B[1, 1],B[1, (-1)]]
 unkn2=[A[2, 1],A[2, (-1)],B[2, 1],B[2, (-1)]]
 
-in_file = open("cfc12","rb")
-cfc12 = pickle.load(in_file)
-in_file.close()
+# in_file = open("cfc12","rb")
+# cfc12 = pickle.load(in_file)
+# in_file.close()
+#
+# in_file = open("cfs12","rb")
+# cfs12 = pickle.load(in_file)
+# in_file.close()
 
-in_file = open("cfs12","rb")
-cfs12 = pickle.load(in_file)
-in_file.close()
-
-eqs = [re(cfc12), im(cfc12), re(cfs12), im(cfs12)]
+# eqs = [re(cfc12), im(cfc12), re(cfs12), im(cfs12)]
 
 in_file = open("eqslist","rb")
 eqslist = pickle.load(in_file)
@@ -70,27 +70,28 @@ par2 = {lam:58.17*10**9, mu:26.13*10**9, Ms:6.099, a:10*10**(-9), T:0.1*10**9,si
 # sol = solve(eqs, unkn)
 # subc = sol
 
-eqss = eqslist[3].copy()
+eqss = eqslist[0].copy()
 i = 0
 for ex in eqss:
     eqss[i] = ex.subs(par0)
     eqss[ i] = eqss[ i].subs(par1)
     eqss[ i] = eqss[ i].evalf(subs=par2)
     i += 1
-sol1 = solve(eqss, unkn2)
+sol1 = solve(eqss, unkn)
 subc1 = sol1
 
 i = 0
 eqs0 = [0,0,0,0]
-for ex in eqslist[0]:
-    eqs0[i]=ex
-    eqs0[i] = eqs0[i] + eqslist[2][i]
+for ex in eqslist[3]:
+    eqs0[i]=ex.copy()
+    # eqs0[i] = eqs0[i] + eqslist[2][i]  # eqs0[2,1] - sin(2*pix*x)
     eqs0[i] = eqs0[i].subs(par0)
     eqs0[i] = eqs0[i].subs(par1)
     eqs0[i] = eqs0[i].subs(subc1)
     eqs0[i] = eqs0[i].evalf(subs=par2)
     i +=1
-sol = solve(eqs0, unkn)
+#eqs0 = [A[2,1],A[2,-1],B[2,1],B[2,-1]] # testline
+sol = solve(eqs0, unkn2)
 subc = sol
 
 subc = subc | subc1
@@ -110,6 +111,7 @@ in_file.close()
 subf = {f:sub_f, df:sub_df, d2f:sub_d2f}
 
 z = symbols('z')
+#n = 1 # testline
 
 Upsilon1p1 = Upsilon1p1.subs(z, x)
 Upsilon1p1 = Upsilon1p1.subs(subc)
@@ -121,6 +123,7 @@ Upsilon1p1 = Upsilon1p1.subs(par1)
 Upsilon1p1 = Upsilon1p1.subs(par2)
 Upsilon1p1 = Upsilon1p1.evalf()  ##
 #print(Upsilon1p1)
+#Upsilon1p1 = Upsilon1p1.subs(e**2, 0) # testline
 
 phi1p1 = phi1p1.subs(z, x)
 phi1p1 = phi1p1.subs(subc)
@@ -132,6 +135,8 @@ phi1p1 = phi1p1.subs(par1)
 phi1p1 = phi1p1.subs(par2)
 phi1p1 = phi1p1.evalf()
 
+#phi1p1 = phi1p1.subs(e**2, 0) # testline
+
 dphi1p1 = dphi1p1.subs(z, x)
 dphi1p1 = dphi1p1.subs(subc)
 
@@ -142,12 +147,14 @@ dphi1p1 = dphi1p1.subs(par1)
 dphi1p1 = dphi1p1.subs(par2)
 dphi1p1 = dphi1p1.evalf()
 
+#dphi1p1 = dphi1p1.subs(e**2, 0) # testline
+
 expoa = 1 - 2 * I * e * df / (1 + I * e * df)  ##
 expoa = expoa.series(e, n=n+1)
 expoa = expoa.removeO()
 
 h = (1 + e**2 * df**2)
-hm = series(1/h ,e ,n=n+1)  ##
+hm = series(1/h, e ,n=n+1)  ##
 hm = hm.removeO()
 
 cr = e * d2f / h ** 3
@@ -158,18 +165,29 @@ w1 = symbols("w1", complex=True)
 
 G1 = phi1p1+conjugate(phi1p1)-(Upsilon1p1+conjugate(phi1p1)-(w1-conjugate(w1))*conjugate(dphi1p1))*expoa
 
+
 G1 = G1.subs(w1, x+I*e*f)
+
 
 G1 = ser(G1, n+1)
 
 G1 = G1.subs(subf)  ##
-G1 = G1.subs(b, 2*pi /a)
+G1 = G1.subs(b, 2*pi)
+#G1 = G1.subs(a, 10*10**(-9))
+
+#G1 = G1.subs(sin(2*pi*x/a),0)
+#G1 = G1.subs(cos(2*pi*x/a),0)
 G1 = G1.subs(a, 10*10**(-9))
 
-sigma_1nn = re(G1)  #eval
+#G1 = G1.subs(b, 0)
+
+#G1 = G1.subs(x, x*a)
+#G1 = G1.subs(a, 10*10**(-9))
+
+sigma_1nn = re(G1).evalf()  #eval
 #print(sigma_1nn)
 
-sigma_1tt_plus_sigma_1nn = re(4*phi1p1)
+sigma_1tt_plus_sigma_1nn = re(4*phi1p1).evalf()
 
 #print(sigma_1tt_plus_sigma_1nn)  ##  -0.I
 
@@ -177,12 +195,12 @@ sigma_1tt=sigma_1tt_plus_sigma_1nn-sigma_1nn
 
 sigmatt = sigma_1tt
 
-sigmatt = sigmatt.subs(e, 0.1)
+sigmatt = sigmatt.subs(e, 0.05)
 
 
 scf = sigmatt.evalf(subs={x: 0})
 
-plot(sigmatt, (x, -0.5, 0.5, 0.001))
+plot(sigmatt, (x, -0.5, 0.5, 0.01))
 
 
 x1 = np.arange(-0.5, 0.5, 0.01, dtype=float)
@@ -196,5 +214,8 @@ points = np.array([[x1[i], x2[i]] for i in range(len(x1)) ])
 
 plt.plot(points[:, 0], points[:, 1])
 #plt.show()
+out_file = open("points6","wb")
+pickle.dump(points, out_file)
+out_file.close()
 
 #np.savetxt("points.csv", points, delimiter=",")
