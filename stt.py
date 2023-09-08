@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import pickle
 
-n = 2
+n = 4
 
 f = symbols('f', real=True)
 df = symbols('df', real=True)
@@ -18,8 +18,12 @@ x = symbols('x', real=True)
 A = IndexedBase('A', real=True)
 B = IndexedBase('B', real=True)
 
-unkn=[A[1, 1],A[1, (-1)],B[1, 1],B[1, (-1)]]
-unkn2=[A[2, 1],A[2, (-1)],B[2, 1],B[2, (-1)]]
+#unkn=[A[1, 1],A[1, (-1)],B[1, 1],B[1, (-1)]]
+#unkn2=[A[2, 1],A[2, (-1)],B[2, 1],B[2, (-1)]]
+unkn = [0]
+
+for k in range(1,n+1):
+    unkn.append([A[k, 1],A[k, (-1)],B[k, 1],B[k, (-1)]])
 
 # in_file = open("cfc12","rb")
 # cfc12 = pickle.load(in_file)
@@ -48,7 +52,8 @@ sigmass0 = symbols('sigma_ss0')
 Ms = symbols("M_s")
 sigmas0 = symbols("sigma_s0")
 T = symbols('T', real=True)
-par2 = {lam:58.17*10**9, mu:26.13*10**9, Ms:6.099, a:10*10**(-9), T:0.1*10**9,sigmass0:1,sigmas0:1}
+par2 = {lam:58.17*10**9, mu:26.13*10**9, Ms:6.099, a:10*10**(-9), T:0.1*10**9,sigmass0:1,sigmas0:1} #origin
+#par2 = {lam:58.17*10**9, mu:26.13*10**9, Ms:6.099, a:10*10**(-9), T:0.1*10**9,sigmass0:0,sigmas0:0}
 
 # eq2 = -1/16/mu*re(-8*((-a*sigmass0*b+(I*B[1, 1]+A[1, 1])*Ms-T*a+sigmas0*(I*A[1, -1]-B[1, -1]))*mu-1/8*a*b*T*Ms*(ka+1))*(ka+1)*b-(I*32*A[1, -1]+32*A[1, 1])*mu**2-16*a*b**2*sigmass0*mu-2*a*b**2*Ms*T*(ka+1))
 # eq4 = -1/16/mu*im(-8*((-a*sigmass0*b+(I*B[1, 1]+A[1, 1])*Ms-T*a+sigmas0*(I*A[1, -1]-B[1, -1]))*mu-1/8*a*b*T*Ms*(ka+1))*(ka+1)*b-(I*32*A[1, -1]+32*A[1, 1])*mu**2-16*a*b**2*sigmass0*mu-2*a*b**2*Ms*T*(ka+1))
@@ -70,31 +75,49 @@ par2 = {lam:58.17*10**9, mu:26.13*10**9, Ms:6.099, a:10*10**(-9), T:0.1*10**9,si
 # sol = solve(eqs, unkn)
 # subc = sol
 
-eqss = eqslist[0].copy()
-i = 0
-for ex in eqss:
-    eqss[i] = ex.subs(par0)
-    eqss[ i] = eqss[ i].subs(par1)
-    eqss[ i] = eqss[ i].evalf(subs=par2)
-    i += 1
-sol1 = solve(eqss, unkn)
-subc1 = sol1
+# unkn=[A[1, 1],A[1, (-1)],B[1, 1],B[1, (-1)]]
+# unkn2=[A[2, 1],A[2, (-1)],B[2, 1],B[2, (-1)]]
+# eqss = eqslist[0].copy()
+# i = 0
+# for ex in eqss:
+#     eqss[i] = ex.subs(par0)
+#     eqss[ i] = eqss[ i].subs(par1)
+#     eqss[ i] = eqss[ i].evalf(subs=par2)
+#     i += 1
+# sol1 = solve(eqss, unkn)
+# subc1 = sol1
+#
+# i = 0
+# eqs0 = [0,0,0,0]
+# for ex in eqslist[3]:
+#     eqs0[i]=ex.copy()
+#     # eqs0[i] = eqs0[i] + eqslist[2][i]  # eqs0[2,1] - sin(2*pix*x)
+#     eqs0[i] = eqs0[i].subs(par0)
+#     eqs0[i] = eqs0[i].subs(par1)
+#     eqs0[i] = eqs0[i].subs(subc1)
+#     eqs0[i] = eqs0[i].evalf(subs=par2)
+#     i +=1
+# # #eqs0 = [A[2,1],A[2,-1],B[2,1],B[2,-1]] # testline
+# sol = solve(eqs0, unkn2)
+# subc = sol
+#
+# subc = subc | subc1
 
-i = 0
-eqs0 = [0,0,0,0]
-for ex in eqslist[3]:
-    eqs0[i]=ex.copy()
-    # eqs0[i] = eqs0[i] + eqslist[2][i]  # eqs0[2,1] - sin(2*pix*x)
-    eqs0[i] = eqs0[i].subs(par0)
-    eqs0[i] = eqs0[i].subs(par1)
-    eqs0[i] = eqs0[i].subs(subc1)
-    eqs0[i] = eqs0[i].evalf(subs=par2)
-    i +=1
-#eqs0 = [A[2,1],A[2,-1],B[2,1],B[2,-1]] # testline
-sol = solve(eqs0, unkn2)
-subc = sol
 
-subc = subc | subc1
+
+subc = {}
+for k in range(1,n+1):
+    eqss = eqslist[(k-1)+n*(k-1)].copy() ##
+    i = 0
+    for ex in eqss:
+        eqss[i] = ex.subs(par0)
+        eqss[i] = eqss[i].subs(par1)
+        eqss[i] = eqss[i].subs(subc)
+        eqss[i] = eqss[i].evalf(subs=par2)
+        i+=1
+    sol0 = solve(eqss, unkn[k])
+    subc = subc | sol0
+
 
 in_file = open("Upsilon1p1N","rb")
 Upsilon1p1 = pickle.load(in_file)
@@ -195,7 +218,7 @@ sigma_1tt=sigma_1tt_plus_sigma_1nn-sigma_1nn
 
 sigmatt = sigma_1tt
 
-sigmatt = sigmatt.subs(e, 0.05)
+sigmatt = sigmatt.subs(e, 0.1)
 
 
 scf = sigmatt.evalf(subs={x: 0})
@@ -212,9 +235,9 @@ x2 = np.array([(10**(-9)*re(sigmatt)).subs(x, xi).evalf() for xi in x1])
 
 points = np.array([[x1[i], x2[i]] for i in range(len(x1)) ])
 
-plt.plot(points[:, 0], points[:, 1])
+#plt.plot(points[:, 0], points[:, 1])
 #plt.show()
-out_file = open("points6","wb")
+out_file = open("points22","wb")
 pickle.dump(points, out_file)
 out_file.close()
 

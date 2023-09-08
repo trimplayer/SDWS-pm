@@ -3,7 +3,7 @@ from sympy import *
 from func import *
 import pickle
 
-n = 2
+n = 4
 x = symbols('x', real=True)
 e = symbols('e', real=True)
 f = symbols('f', real=True)
@@ -84,57 +84,94 @@ for l in range(n+1):
 # reqq11 = reqq11.subs(subf)
 # #reqq11 = simplify(reqq11)
 # reqq11 = reqq11.rewrite(exp(I*b*x))
-reqq11 = eqq1l[1].subs(subp) # todo: for any power
-reqq11 = reqq11.subs(subf)
-reqq11 = reqq11.rewrite(exp(I*b*x))
-reqq12 = eqq1l[2].subs(subp)
-reqq12 = reqq12.subs(subf)
-reqq12 = reqq12.rewrite(exp(I*b*x))
+
+#reqq11 = eqq1l[1].subs(subp) # todo: for any power
+#reqq11 = reqq11.subs(subf)
+#reqq11 = reqq11.rewrite(exp(I*b*x))
+#reqq12 = eqq1l[2].subs(subp)
+#reqq12 = reqq12.subs(subf)
+#reqq12 = reqq12.rewrite(exp(I*b*x))
 
 t = symbols('t', real=True)
 
-reqq11 = reqq11.expand()
-reqq11 = reqq11.subs(exp(-I*b*x), 1/t)
-reqq11 = reqq11.subs(exp(I*b*x), t)
-reqq11 = reqq11.subs(exp(-2*I*b*x), 1/(t**2)) # todo: for any power
-reqq11 = reqq11.subs(exp(2*I*b*x), t**2)
-reqq11 = collect(reqq11, t)
-reqq12 = reqq12.expand()
-reqq12 = reqq12.subs(exp(-I*b*x), 1/t)
-reqq12 = reqq12.subs(exp(I*b*x), t)
-reqq12 = reqq12.subs(exp(-2*I*b*x), 1/(t**2))
-reqq12 = reqq12.subs(exp(2*I*b*x), t**2)
-reqq12 = collect(reqq12, t)
+#reqq11 = reqq11.expand()
+#reqq11 = reqq11.subs(exp(-I*b*x), 1/t)
+#reqq11 = reqq11.subs(exp(I*b*x), t)
+#reqq11 = reqq11.subs(exp(-2*I*b*x), 1/(t**2)) # todo: for any power
+#reqq11 = reqq11.subs(exp(2*I*b*x), t**2)
+#reqq11 = collect(reqq11, t)
+#reqq12 = reqq12.expand()
+#reqq12 = reqq12.subs(exp(-I*b*x), 1/t)
+#reqq12 = reqq12.subs(exp(I*b*x), t)
+#reqq12 = reqq12.subs(exp(-2*I*b*x), 1/(t**2))
+#reqq12 = reqq12.subs(exp(2*I*b*x), t**2)
+#reqq12 = collect(reqq12, t)
 
+reqq1i = []
+
+for i in range(n):
+    reqq1i.append(eqq1l[i+1].subs(subp))
+    reqq1i[i] = reqq1i[i].subs(subf)
+    reqq1i[i] = reqq1i[i].rewrite(exp(I*b*x))
+    reqq1i[i] = reqq1i[i].expand()
+    for j in range(1,n+1):
+        reqq1i[i] = reqq1i[i].subs(exp(-j*I*b*x), 1/(t**j))
+        reqq1i[i] = reqq1i[i].subs(exp(j*I*b*x), t**j)
+
+    reqq1i[i] = collect(reqq1i[i], t) ##coolect?
 
 #  upsilon [1, 0]
 z = symbols('z')
-Upsilon1p1 = Upsilon1p1.subs(Upsilonp1ij1[1, 0], reqq11.coeff(t, 1) * exp(I*b*z)) # todo: for any power
-Upsilon1p1 = Upsilon1p1.subs(Upsilonp1ij1[2, 0], reqq12.coeff(t, 2) * exp(2*I*b*z))
-Upsilon1p1 = Upsilon1p1.subs(subp)
+#Upsilon1p1 = Upsilon1p1.subs(Upsilonp1ij1[1, 0], reqq1i[0].coeff(t, 1) * exp(I*b*z)) # todo: for any power
+#Upsilon1p1 = Upsilon1p1.subs(Upsilonp1ij1[2, 0], reqq1i[1].coeff(t, 2) * exp(2*I*b*z))
+#Upsilon1p1 = Upsilon1p1.subs(subp)
 
+for i in range(1,n+1):
+    Upsilon1p1 = Upsilon1p1.subs(Upsilonp1ij1[i, 0], reqq1i[i-1].coeff(t, i) * exp(i*I*b*z))
+Upsilon1p1 = Upsilon1p1.subs(subp)
 
 out_file = open("Upsilon1p1N","wb")
 pickle.dump(Upsilon1p1, out_file)
 out_file.close()
 
 
-subphi = -1*(reqq11.coeff(t, -1) * exp(-I*b*z)) # todo: for any power
-subphi2 = -1*(reqq12.coeff(t, -2) * exp(-2*I*b*z))
-phi1p1 = phi1p1.subs(phip1ij1[1,0], subphi)
-phi1p1 = phi1p1.subs(phip1ij1[2,0], subphi2)
-phi1p1 = phi1p1.subs(phip1ij1[1,1], diff(subphi, z))
-phi1p1 = phi1p1.subs(phip1ij1[1,2], diff(subphi2, z))
+#subphi = -1*(reqq11.coeff(t, -1) * exp(-I*b*z)) # todo: for any power
+#subphi2 = -1*(reqq12.coeff(t, -2) * exp(-2*I*b*z))
+
+subphii = [0]
+for i in range(1,n+1):
+    subphii.append(-1*(reqq1i[i-1].coeff(t, -i) * exp(-i*I*b*z)))
+
+#phi1p1 = phi1p1.subs(phip1ij1[1,0], subphi)
+#phi1p1 = phi1p1.subs(phip1ij1[2,0], subphi2)
+#phi1p1 = phi1p1.subs(phip1ij1[1,1], diff(subphi, z))
+#phi1p1 = phi1p1.subs(phip1ij1[1,2], diff(subphi2, z))
+#phi1p1 = phi1p1.subs(subp)
+
+for i in range(1,n+1):
+    phi1p1 = phi1p1.subs(phip1ij1[i,0], subphii[i])
+    subphidiff = subphii[i]
+    for j in range(1,n+1):
+        subphidiff = diff(subphidiff, z)
+        phi1p1 = phi1p1.subs(phip1ij1[i, j], subphidiff)
 phi1p1 = phi1p1.subs(subp)
 
 out_file = open("phi1p1N","wb")
 pickle.dump(phi1p1,out_file)
 out_file.close()
 
-dphi1p1 = dphi1p1.subs(phip1ij1[1,0], subphi)  # todo: for any power
-dphi1p1 = dphi1p1.subs(phip1ij1[1,1], diff(subphi, z))
-dphi1p1 = dphi1p1.subs(phip1ij1[2,0], subphi2)
-dphi1p1 = dphi1p1.subs(phip1ij1[2,1], diff(subphi2, z))
+#dphi1p1 = dphi1p1.subs(phip1ij1[1,0], subphi)  # todo: for any power
+#dphi1p1 = dphi1p1.subs(phip1ij1[1,1], diff(subphi, z))
+#dphi1p1 = dphi1p1.subs(phip1ij1[2,0], subphi2)
+#dphi1p1 = dphi1p1.subs(phip1ij1[2,1], diff(subphi2, z))
+#dphi1p1 = dphi1p1.subs(subp)
+
+for i in range(1,n+1):
+    dphi1p1 = dphi1p1.subs(phip1ij1[i,0], subphii[i])
+    subphidiff = subphii[i]
+    for j in range(1,n): # n or n+1
+        subphidiff = diff(subphidiff,z)
+        dphi1p1 = dphi1p1.subs(phip1ij1[i, j], subphidiff)
 dphi1p1 = dphi1p1.subs(subp)
 
 out_file = open("dphi1p1N","wb")

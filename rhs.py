@@ -3,7 +3,7 @@ from sympy import *
 from func import *
 import pickle
 
-n = 2
+n = 4
 e = symbols('e', real=True)
 f = symbols('f', real=True)
 df = symbols('df', real=True)

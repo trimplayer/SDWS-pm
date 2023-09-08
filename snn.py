@@ -48,7 +48,8 @@ sigmass0 = symbols('sigma_ss0')
 Ms = symbols("M_s")
 sigmas0 = symbols("sigma_s0")
 T = symbols('T', real=True)
-par2 = {lam:58.17*10**9, mu:26.13*10**9, Ms:6.099, a:10*10**(-9), T:0.1*10**9,sigmass0:1,sigmas0:1}
+#par2 = {lam:58.17*10**9, mu:26.13*10**9, Ms:6.099, a:10*10**(-9), T:0.1*10**9,sigmass0:1,sigmas0:1} #origin
+par2 = {lam:58.17*10**9, mu:26.13*10**9, Ms:6.099, a:10*10**(-9), T:0.1*10**9,sigmass0:0,sigmas0:0}
 
 # eq2 = -1/16/mu*re(-8*((-a*sigmass0*b+(I*B[1, 1]+A[1, 1])*Ms-T*a+sigmas0*(I*A[1, -1]-B[1, -1]))*mu-1/8*a*b*T*Ms*(ka+1))*(ka+1)*b-(I*32*A[1, -1]+32*A[1, 1])*mu**2-16*a*b**2*sigmass0*mu-2*a*b**2*Ms*T*(ka+1))
 # eq4 = -1/16/mu*im(-8*((-a*sigmass0*b+(I*B[1, 1]+A[1, 1])*Ms-T*a+sigmas0*(I*A[1, -1]-B[1, -1]))*mu-1/8*a*b*T*Ms*(ka+1))*(ka+1)*b-(I*32*A[1, -1]+32*A[1, 1])*mu**2-16*a*b**2*sigmass0*mu-2*a*b**2*Ms*T*(ka+1))
@@ -193,6 +194,7 @@ sigma_1tt=sigma_1tt_plus_sigma_1nn-sigma_1nn  ##
 
 sigmann = sigma_1nn
 sigmann = sigmann.subs(e, 0.05)
+
 scf = sigmann.evalf(subs={x: 0})
 
 plot(sigmann, (x, -0.5, 0.5, 0.01))
@@ -201,7 +203,7 @@ x1 = np.arange(-0.5, 0.5, 0.01, dtype=float)
 x2 = np.array([(10**(-9)*re(sigmann)).subs(x, xi).evalf() for xi in x1])
 
 points = np.array([[x1[i], x2[i]] for i in range(len(x1)) ])
-out_file = open("points8","wb")
+out_file = open("points24","wb")
 pickle.dump(points, out_file)
 out_file.close()
 
