@@ -122,9 +122,9 @@ for i in range(n):
 
 #  upsilon [1, 0]
 z = symbols('z')
-#Upsilon1p1 = Upsilon1p1.subs(Upsilonp1ij1[1, 0], reqq1i[0].coeff(t, 1) * exp(I*b*z)) # todo: for any power
-#Upsilon1p1 = Upsilon1p1.subs(Upsilonp1ij1[2, 0], reqq1i[1].coeff(t, 2) * exp(2*I*b*z))
-#Upsilon1p1 = Upsilon1p1.subs(subp)
+#Upsilonp11 = Upsilonp11.subs(Upsilonp1ij1[1, 0], reqq1i[0].coeff(t, 1) * exp(I*b*z)) # todo: for any power
+#Upsilonp11 = Upsilonp11.subs(Upsilonp1ij1[2, 0], reqq1i[1].coeff(t, 2) * exp(2*I*b*z))
+#Upsilonp11 = Upsilonp11.subs(subp)
 
 for i in range(1,n+1):
     Upsilon1p1 = Upsilon1p1.subs(Upsilonp1ij1[i, 0], reqq1i[i-1].coeff(t, i) * exp(i*I*b*z))
@@ -142,11 +142,11 @@ subphii = [0]
 for i in range(1,n+1):
     subphii.append(-1*(reqq1i[i-1].coeff(t, -i) * exp(-i*I*b*z)))
 
-#phi1p1 = phi1p1.subs(phip1ij1[1,0], subphi)
-#phi1p1 = phi1p1.subs(phip1ij1[2,0], subphi2)
-#phi1p1 = phi1p1.subs(phip1ij1[1,1], diff(subphi, z))
-#phi1p1 = phi1p1.subs(phip1ij1[1,2], diff(subphi2, z))
-#phi1p1 = phi1p1.subs(subp)
+#phip11 = phip11.subs(phip1ij1[1,0], subphi)
+#phip11 = phip11.subs(phip1ij1[2,0], subphi2)
+#phip11 = phip11.subs(phip1ij1[1,1], diff(subphi, z))
+#phip11 = phip11.subs(phip1ij1[1,2], diff(subphi2, z))
+#phip11 = phip11.subs(subp)
 
 for i in range(1,n+1):
     phi1p1 = phi1p1.subs(phip1ij1[i,0], subphii[i])
@@ -160,11 +160,11 @@ out_file = open("phi1p1N","wb")
 pickle.dump(phi1p1,out_file)
 out_file.close()
 
-#dphi1p1 = dphi1p1.subs(phip1ij1[1,0], subphi)  # todo: for any power
-#dphi1p1 = dphi1p1.subs(phip1ij1[1,1], diff(subphi, z))
-#dphi1p1 = dphi1p1.subs(phip1ij1[2,0], subphi2)
-#dphi1p1 = dphi1p1.subs(phip1ij1[2,1], diff(subphi2, z))
-#dphi1p1 = dphi1p1.subs(subp)
+#dphip11 = dphip11.subs(phip1ij1[1,0], subphi)  # todo: for any power
+#dphip11 = dphip11.subs(phip1ij1[1,1], diff(subphi, z))
+#dphip11 = dphip11.subs(phip1ij1[2,0], subphi2)
+#dphip11 = dphip11.subs(phip1ij1[2,1], diff(subphi2, z))
+#dphip11 = dphip11.subs(subp)
 
 for i in range(1,n+1):
     dphi1p1 = dphi1p1.subs(phip1ij1[i,0], subphii[i])

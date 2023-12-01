@@ -123,8 +123,8 @@ Upsilon1p1 = Upsilon1p1.subs(par0)
 Upsilon1p1 = Upsilon1p1.subs(par1)
 Upsilon1p1 = Upsilon1p1.subs(par2)
 Upsilon1p1 = Upsilon1p1.evalf()  ##
-#print(Upsilon1p1)
-#Upsilon1p1 = Upsilon1p1.subs(e**2, 0) # testline
+#print(Upsilonp11)
+#Upsilonp11 = Upsilonp11.subs(e**2, 0) # testline
 
 phi1p1 = phi1p1.subs(z, x)
 phi1p1 = phi1p1.subs(subc)
@@ -136,7 +136,7 @@ phi1p1 = phi1p1.subs(par1)
 phi1p1 = phi1p1.subs(par2)
 phi1p1 = phi1p1.evalf()
 
-#phi1p1 = phi1p1.subs(e**2, 0) # testline
+#phip11 = phip11.subs(e**2, 0) # testline
 
 dphi1p1 = dphi1p1.subs(z, x)
 dphi1p1 = dphi1p1.subs(subc)
@@ -148,7 +148,7 @@ dphi1p1 = dphi1p1.subs(par1)
 dphi1p1 = dphi1p1.subs(par2)
 dphi1p1 = dphi1p1.evalf()
 
-#dphi1p1 = dphi1p1.subs(e**2, 0) # testline
+#dphip11 = dphip11.subs(e**2, 0) # testline
 
 expoa = 1 - 2 * I * e * df / (1 + I * e * df)  ##
 expoa = expoa.series(e, n=n+1)

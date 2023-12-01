@@ -34,7 +34,7 @@ z = symbols('z')
 
 subf = {f:sub_f, df:sub_df, d2f:sub_d2f}
 
-#Upsilon1p1 = Upsilon1p1.subs({z: x-I*y, y:0})  # y = 0
+#Upsilonp11 = Upsilonp11.subs({z: x-I*y, y:0})  # y = 0
 qs0 = symbols('q_s0', real=True)
 Upsilon1p1 = Upsilon1p1.subs(z, x)
 Upsilon1p1 = Upsilon1p1.subs(qs0, 0)
