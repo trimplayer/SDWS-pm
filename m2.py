@@ -10,7 +10,7 @@ xx = []
 xee = []
 s_data = []
 
-for n in range(1,16):
+for n in range(1,11):
     ## 1
     e = symbols('e', real=True)
     f = symbols('f', real=True)
@@ -303,130 +303,136 @@ for n in range(1,16):
     Ms = symbols("M_s")
     sigmas0 = symbols("sigma_s0")
     T = symbols('T', real=True)
-    #par2 = {lam:58.17*10**9, mu:26.13*10**9, Ms:6.099, a:10*10**(-9), T:0.1*10**9,sigmass0:1,sigmas0:1} #origin
-    par2 = {lam: 58.17 * 10 ** 9, mu: 26.13 * 10 ** 9, Ms: 6.0, a: 100 * 10 ** (-9), T: 0.1 * 10 ** 9, sigmass0: 0,
-            sigmas0: 0}
+    xx =[]
+    xmsm =[]
+    upsre = Upsilonp11
+    phire = phip11
+    dphire = dphip11
+    for msm in range(1,21):
+        #par2 = {lam:58.17*10**9, mu:26.13*10**9, Ms:6.099, a:10*10**(-9), T:0.1*10**9,sigmass0:1,sigmas0:1} #origin
+        par2 = {lam: 58.17 * 10 ** 9, mu: 26.13 * 10 ** 9, Ms: msm, a: 10 * 10 ** (-9), T: 0.1 * 10 ** 9, sigmass0: 1,
+                sigmas0: 1}
+        subc = {}
+        for k in range(1,n+1):
+            eqss = eqslist[(k-1)+n*(k-1)].copy() ##
+            i = 0
+            for ex in eqss:
+                eqss[i] = ex.subs(par0)
+                eqss[i] = eqss[i].subs(par1)
+                eqss[i] = eqss[i].subs(subc)
+                eqss[i] = eqss[i].evalf(subs=par2)
+                i+=1
+            sol0 = solve(eqss, unkn[k])
+            subc = subc | sol0
 
-    subc = {}
-    for k in range(1,n+1):
-        eqss = eqslist[(k-1)+n*(k-1)].copy() ##
-        i = 0
-        for ex in eqss:
-            eqss[i] = ex.subs(par0)
-            eqss[i] = eqss[i].subs(par1)
-            eqss[i] = eqss[i].subs(subc)
-            eqss[i] = eqss[i].evalf(subs=par2)
-            i+=1
-        sol0 = solve(eqss, unkn[k])
-        subc = subc | sol0
+        subf = {f:sub_f, df:sub_df, d2f:sub_d2f}
 
-    subf = {f:sub_f, df:sub_df, d2f:sub_d2f}
+        z = symbols('z')
 
-    z = symbols('z')
+        Upsilonp11 = upsre
 
+        Upsilonp11 = Upsilonp11.subs(z, x)
+        Upsilonp11 = Upsilonp11.subs(subc)
 
-    Upsilonp11 = Upsilonp11.subs(z, x)
-    Upsilonp11 = Upsilonp11.subs(subc)
+        Upsilonp11 = Upsilonp11.subs(subf)
 
-    Upsilonp11 = Upsilonp11.subs(subf)
+        Upsilonp11 = Upsilonp11.subs(par0)
+        Upsilonp11 = Upsilonp11.subs(par1)
+        Upsilonp11 = Upsilonp11.subs(par2)
+        Upsilonp11 = Upsilonp11.evalf()
 
-    Upsilonp11 = Upsilonp11.subs(par0)
-    Upsilonp11 = Upsilonp11.subs(par1)
-    Upsilonp11 = Upsilonp11.subs(par2)
-    Upsilonp11 = Upsilonp11.evalf()
+        phip11=phire
 
+        phip11 = phip11.subs(z, x)
+        phip11 = phip11.subs(subc)
 
-    phip11 = phip11.subs(z, x)
-    phip11 = phip11.subs(subc)
+        phip11 = phip11.subs(subf)
 
-    phip11 = phip11.subs(subf)
+        phip11 = phip11.subs(par0)
+        phip11 = phip11.subs(par1)
+        phip11 = phip11.subs(par2)
+        phip11 = phip11.evalf()
 
-    phip11 = phip11.subs(par0)
-    phip11 = phip11.subs(par1)
-    phip11 = phip11.subs(par2)
-    phip11 = phip11.evalf()
+        dphip11 = dphire
 
+        dphip11 = dphip11.subs(z, x)
+        dphip11 = dphip11.subs(subc)
 
+        dphip11 = dphip11.subs(subf)
 
-    dphip11 = dphip11.subs(z, x)
-    dphip11 = dphip11.subs(subc)
+        dphip11 = dphip11.subs(par0)
+        dphip11 = dphip11.subs(par1)
+        dphip11 = dphip11.subs(par2)
+        dphip11 = dphip11.evalf()
 
-    dphip11 = dphip11.subs(subf)
+        expoa = 1 - 2 * I * e * df / (1 + I * e * df)  ##
+        expoa = expoa.series(e, n=n+1)
+        expoa = expoa.removeO()
 
-    dphip11 = dphip11.subs(par0)
-    dphip11 = dphip11.subs(par1)
-    dphip11 = dphip11.subs(par2)
-    dphip11 = dphip11.evalf()
+        h = (1 + e**2 * df**2)
+        hm = series(1/h, e ,n=n+1)  ##
+        hm = hm.removeO()
 
-    expoa = 1 - 2 * I * e * df / (1 + I * e * df)  ##
-    expoa = expoa.series(e, n=n+1)
-    expoa = expoa.removeO()
+        cr = e * d2f / h ** 3
+        cr = cr.series(e, n=n+1)
+        cr = cr.removeO()
 
-    h = (1 + e**2 * df**2)
-    hm = series(1/h, e ,n=n+1)  ##
-    hm = hm.removeO()
+        w1 = symbols("w1", complex=True)
 
-    cr = e * d2f / h ** 3
-    cr = cr.series(e, n=n+1)
-    cr = cr.removeO()
-
-    w1 = symbols("w1", complex=True)
-
-    G1 = phip11+conjugate(phip11)-(Upsilonp11+conjugate(phip11)-(w1-conjugate(w1))*conjugate(dphip11))*expoa
-
-
-    G1 = G1.subs(w1, x+I*e*f)
-
-
-    G1 = ser(G1, n+1)
-
-    G1 = G1.subs(subf)  ##
-    G1 = G1.subs(b, 2*pi)
-
-    G1 = G1.subs(a, 10*10**(-9))
+        G1 = phip11+conjugate(phip11)-(Upsilonp11+conjugate(phip11)-(w1-conjugate(w1))*conjugate(dphip11))*expoa
 
 
-
-    sigma_1nn = re(G1).evalf()
-
-
-    sigma_1tt_plus_sigma_1nn = re(4*phip11).evalf()
+        G1 = G1.subs(w1, x+I*e*f)
 
 
+        G1 = ser(G1, n+1)
 
-    sigma_1tt=sigma_1tt_plus_sigma_1nn-sigma_1nn
+        G1 = G1.subs(subf)  ##
+        G1 = G1.subs(b, 2*pi)
 
-    #sigmatt = sigma_1tt
-    sigmann = sigma_1nn
-    xee = []
-    xx=[]
-    for ee in range(1,20):
+        G1 = G1.subs(a, 10*10**(-9))
 
-    #sigmatt = sigmatt.subs(e, 0.1)
+
+
+        sigma_1nn = re(G1).evalf()
+
+
+        sigma_1tt_plus_sigma_1nn = re(4*phip11).evalf()
+
+
+
+        sigma_1tt=sigma_1tt_plus_sigma_1nn-sigma_1nn
+
         #sigmatt = sigma_1tt
-        #sigmatt = sigmatt.subs(e, ee*0.01)
-        #scf = sigmatt.evalf(subs={x: 0})
         sigmann = sigma_1nn
-        sigmann = sigmann.subs(e,ee*0.01)
-        scf = sigmann.evalf(subs={x:0})
+
+
+
+
+        #sigmatt = sigmatt.subs(e, 0.1)
+        #scf = sigmatt.evalf(subs={x: 0})
+        #sigmann = sigma_1nn
+        sigmann = sigmann.subs(e,0.1)
+        scf = sigmann.evalf(subs={x:1/2})
         ##scf = sigmatt.evalf(subs={x: 0})
-        xee.append(ee*0.01)
+
         xx.append(scf)
-    #scf = sigmatt.evalf(subs={x: 0})
+        xmsm.append(msm)
+        #scf = sigmatt.evalf(subs={x: 0})
     if s_data == []:
-        s_data.append(xee)
+        s_data.append(xmsm)
     s_data.append(xx)
-    #nn.append(n)
-    #xx.append(scf)
-    #plot(sigmatt, (x, -0.5, 0.5, 0.01))
-    plt.plot(xee, xx,label='$n={n}$'.format(n=n))
+        #nn.append(n)
+        #xx.append(scf)
+        #plot(sigmatt, (x, -0.5, 0.5, 0.01))
+    plt.plot(xmsm, xx,label='$n={n}$'.format(n=n))
 
 #plt.plot(nn,xx)
 #plt.plot(xee,xx)
 s_data = np.array(s_data)
-np.savetxt("snn_n15_a100_sig0.csv", s_data, delimiter=",")
+np.savetxt("snn_n10_Ms.csv", s_data, delimiter=",")
 #plt.plot(s_data[0, :], s_data[2, :])
 
-plt.title('snn_n15')
+plt.title('sigma_nn')
 plt.legend(loc='best')
 plt.show()
