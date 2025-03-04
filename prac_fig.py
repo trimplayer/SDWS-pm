@@ -1,9 +1,9 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-points1= np.genfromtxt("stt_a10_Ms6_1.csv", delimiter=",")
-points2= np.genfromtxt("stt_a10_Ms6_T0.csv", delimiter=",")
-points3= np.genfromtxt("stt_a10_Ms6_sig0.csv", delimiter=",")
+points1= np.genfromtxt("stt_a100_Ms60_1.csv", delimiter=",")
+points2= np.genfromtxt("stt_a100_Ms60_T0.csv", delimiter=",")
+points3= np.genfromtxt("stt_a100_Ms60_sig0.csv", delimiter=",")
 
 #a  = 100
 
@@ -42,9 +42,9 @@ ax[0].set_xlabel(r"$\varepsilon$",fontsize = 24)
 ax[0].set_ylabel(r"${\sigma _{tt}}$, ГПа",fontsize = 24)
 ax[0].legend(loc='best')
 
-points4= np.genfromtxt("snn_a10_Ms6_1.csv", delimiter=",")
-points5= np.genfromtxt("snn_a10_Ms6_T0.csv", delimiter=",")
-points6= np.genfromtxt("snn_a10_Ms6_sig0.csv", delimiter=",")
+points4= np.genfromtxt("snn_a100_Ms60_1.csv", delimiter=",")
+points5= np.genfromtxt("snn_a100_Ms60_T0.csv", delimiter=",")
+points6= np.genfromtxt("snn_a100_Ms60_sig0.csv", delimiter=",")
 
 ax[1].plot(points4[0, 4:10], points4[-1, 4:10] /1e9,'r',label="$T=0.1$ ГПа; ${\sigma _{0}^{s}}=1$ Н/м")
 ax[1].plot(points5[0, 4:10], points5[-1, 4:10] /1e9,'g',label="$T=0$ ГПа; ${\sigma _{0}^{s}}=1$ Н/м" )

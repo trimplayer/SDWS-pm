@@ -10,7 +10,7 @@ xx = []
 xee = []
 s_data = []
 
-for n in range(1,11):
+for n in [1,15]:
     ## 1
     e = symbols('e', real=True)
     f = symbols('f', real=True)
@@ -308,10 +308,10 @@ for n in range(1,11):
     upsre = Upsilonp11
     phire = phip11
     dphire = dphip11
-    for msm in range(1,21):
+    for msm in range(1,101,1):
         #par2 = {lam:58.17*10**9, mu:26.13*10**9, Ms:6.099, a:10*10**(-9), T:0.1*10**9,sigmass0:1,sigmas0:1} #origin
-        par2 = {lam: 58.17 * 10 ** 9, mu: 26.13 * 10 ** 9, Ms: msm, a: 10 * 10 ** (-9), T: 0.1 * 10 ** 9, sigmass0: 1,
-                sigmas0: 1}
+        par2 = {lam: 58.17 * 10 ** 9, mu: 26.13 * 10 ** 9, Ms: 6.099, a: 10 * 10 ** (-9), T: 0.1 * 10 ** 9, sigmass0: msm*0.1,
+                sigmas0: msm*0.1}
         subc = {}
         for k in range(1,n+1):
             eqss = eqslist[(k-1)+n*(k-1)].copy() ##
@@ -403,16 +403,16 @@ for n in range(1,11):
 
         sigma_1tt=sigma_1tt_plus_sigma_1nn-sigma_1nn
 
-        #sigmatt = sigma_1tt
-        sigmann = sigma_1nn
-
-
-
-
-        #sigmatt = sigmatt.subs(e, 0.1)
-        #scf = sigmatt.evalf(subs={x: 0})
+        sigmatt = sigma_1tt
         #sigmann = sigma_1nn
-        sigmann = sigmann.subs(e,0.1)
+
+
+
+
+        #sigmatt = sigmatt.subs(e, 0.05)
+        #scf = sigmatt.evalf(subs={x: 0})
+        sigmann = sigma_1nn
+        sigmann = sigmann.subs(e,0.05)
         scf = sigmann.evalf(subs={x:1/2})
         ##scf = sigmatt.evalf(subs={x: 0})
 
@@ -430,9 +430,9 @@ for n in range(1,11):
 #plt.plot(nn,xx)
 #plt.plot(xee,xx)
 s_data = np.array(s_data)
-np.savetxt("snn_n10_Ms.csv", s_data, delimiter=",")
+np.savetxt("snn_sigma_e005.csv", s_data, delimiter=",")
 #plt.plot(s_data[0, :], s_data[2, :])
 
-plt.title('sigma_nn')
+plt.title('sigma_tt')
 plt.legend(loc='best')
 plt.show()

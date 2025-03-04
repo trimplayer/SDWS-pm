@@ -10,7 +10,7 @@ xx = []
 xee = []
 s_data = []
 
-for n in range(1,16):
+for n in range(1,3):
     ## 1
     e = symbols('e', real=True)
     f = symbols('f', real=True)
@@ -101,6 +101,8 @@ for n in range(1,16):
     eqq1 = eqq1.subs(w1,x+I*e*f)
 
     eqq1 = ser(eqq1, n+1)
+
+
 
     ## 3
 
@@ -195,6 +197,8 @@ for n in range(1,16):
             subphidiff = diff(subphidiff,z)
             dphip11 = dphip11.subs(phip1ij1[i, j], subphidiff)
     dphip11 = dphip11.subs(subp)
+
+
 
 
     ## 4
@@ -303,22 +307,31 @@ for n in range(1,16):
     Ms = symbols("M_s")
     sigmas0 = symbols("sigma_s0")
     T = symbols('T', real=True)
-    #par2 = {lam:58.17*10**9, mu:26.13*10**9, Ms:6.099, a:10*10**(-9), T:0.1*10**9,sigmass0:1,sigmas0:1} #origin
-    par2 = {lam: 58.17 * 10 ** 9, mu: 26.13 * 10 ** 9, Ms: 6.0, a: 100 * 10 ** (-9), T: 0.1 * 10 ** 9, sigmass0: 0,
-            sigmas0: 0}
+    par2 = {lam:58.17*10**9, mu:26.13*10**9, Ms:6.099, a:10*10**(-9), T:0.1*10**9,sigmass0:1,sigmas0:1} #origin
+    #par2 = {lam: 58.17 * 10 ** 9, mu: 26.13 * 10 ** 9, Ms: 6.0, a: 100 * 10 ** (-9), T: 0.1 * 10 ** 9, sigmass0: 0,
+     #       sigmas0: 0}
 
     subc = {}
+
     for k in range(1,n+1):
         eqss = eqslist[(k-1)+n*(k-1)].copy() ##
+
         i = 0
         for ex in eqss:
             eqss[i] = ex.subs(par0)
             eqss[i] = eqss[i].subs(par1)
             eqss[i] = eqss[i].subs(subc)
             eqss[i] = eqss[i].evalf(subs=par2)
+
             i+=1
         sol0 = solve(eqss, unkn[k])
+
+
         subc = subc | sol0
+
+    #print(subc)
+
+
 
     subf = {f:sub_f, df:sub_df, d2f:sub_d2f}
 
