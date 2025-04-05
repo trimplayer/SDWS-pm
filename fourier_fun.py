@@ -22,7 +22,7 @@ fc_expr = (2/a) * Integral(f_expr.subs(x, t) * cos(2*k*pi*t/a), (t, -a/2, a/2))
 fc_func = Lambda((a, y_0, k), fc_expr)
 
 a_val = 1
-y0_val = 0.5
+y0_val = 2.0
 
 
 coeffs = []
@@ -53,8 +53,10 @@ plt.legend(fontsize=14)
 plt.grid(True)
 plt.show()
 
+s_data = np.array([x_vals,f_values])
 
-print(result_F_expr,x)
+np.savetxt("surface_y2.csv", s_data, delimiter=",")
+
 
 
 
