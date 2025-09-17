@@ -7,7 +7,7 @@ import pickle
 from matplotlib import pyplot as plt
 
 n_fur = 5 # fourier order              ######## don't forget to change
-n_max = 2  # max approximation order
+n_max = 1  # max approximation order
 s_data = [] # data to save in file
 
 
@@ -22,7 +22,7 @@ in_file = open("fou_sub_d2f","rb")
 fou_sub_d2f = pickle.load(in_file)
 in_file.close()
 
-for n in range(2, n_max+1):
+for n in range(1, n_max+1):
 
     #
     # 1 - rhs
@@ -161,7 +161,7 @@ for n in range(2, n_max+1):
         #sub_dus = (A[k, 1] + I * A[k, (-1)]) * cos(k * b * x) + (B[k, 1] + I * B[k, (-1)]) * sin(k * b * x) # for non-fourier series
         sub_dus = 0
         for k_f in range (1,n_fur+1):
-            sub_dus += (A[k, k_f] + I * A[k, (-k_f)]) * cos(k_f * b * x) + (B[k, k_f] + I * B[k, (-k_f)]) * sin(k_f * b * x)   ######## here is trig coeffs set to for order
+            sub_dus += (A[k, k_f] + I * A[k, (-k_f)]) * cos(k_f * b * x) + (B[k, k_f] + I * B[k, (-k_f)]) * sin(k_f * b * x)
 
 
         subp[dusij[k, 0]] = sub_dus
@@ -195,7 +195,7 @@ for n in range(2, n_max+1):
             reqq1i[i] = reqq1i[i].subs(exp(-j * I * b * x), 1 / (t ** j))
             reqq1i[i] = reqq1i[i].subs(exp(j * I * b * x), t ** j)
 
-        reqq1i[i] = collect(reqq1i[i], t)                                       ####### resulting equation seems like right but not 100% checked
+        reqq1i[i] = collect(reqq1i[i], t)
 
     # potentials substitution
 
@@ -204,7 +204,7 @@ for n in range(2, n_max+1):
         subupsilon.append(0)
         for k_f in range(1,n_fur+1):
 
-            subupsilon[k] += (reqq1i[k-1].coeff(t,k_f)*exp(k_f * I * b * z))              ##### brilliant moves with indexes as good as frauds on train stations
+            subupsilon[k] += (reqq1i[k-1].coeff(t,k_f)*exp(k_f * I * b * z))
 
 
 
@@ -443,12 +443,12 @@ for n in range(2, n_max+1):
 
     # G1 -> stress
 
-    sigmatt = sigma_1tt # for sigma tt
-    sigmann = sigma_1nn # for sigma nn
+    sigmatt = sigma_1tt
+    sigmann = sigma_1nn
 
     scf = sigmatt.evalf(subs={x: 0})
 
-    sigmatt = sigmatt.subs(e, 0.01)
+    sigmatt = sigmatt.subs(e, 0.1)
     #sigmatt = sigmatt.subs(f, 0)
     #sigmatt = sigmatt.subs(df,0)
 
@@ -464,7 +464,7 @@ for n in range(2, n_max+1):
 
 
 
-    #plot(sigmatt, (x, -0.5, 0.5))
+    plot(sigmatt, (x, -0.5, 0.5))
 
     # data saving and plotting
     xee = []
@@ -494,11 +494,11 @@ for n in range(2, n_max+1):
     if s_data == []:
         s_data.append(xee)
     s_data.append(xx)
-    plt.plot(xee, xx, label='$n={n}$'.format(n=n))
+    #plt.plot(xee, xx, label='$n={n}$'.format(n=n))
 
 # data saving
 s_data = np.array(s_data)
-np.savetxt("stt_fou_y05.csv", s_data, delimiter=",")
+#np.savetxt("stt_fou_y05_n1.csv", s_data, delimiter=",")
 
 
 #plt.title('snn_n15')
