@@ -7,8 +7,9 @@ import pickle
 from matplotlib import pyplot as plt
 
 n_fur = 5 # fourier order              ######## don't forget to change
-n_max = 2  # max approximation order
+n_max = 5  # max approximation order
 s_data = [] # data to save in file
+subc_hist = {}
 
 
 # fourier
@@ -60,8 +61,8 @@ for n in range(1, n_max+1):
     b = symbols('b', real=True)
     i, j = symbols('i j', cls=Idx)
 
-    subf = {f: sub_f, df: sub_df, d2f: sub_d2f}
-
+    # subf = {f: sub_f, df: sub_df, d2f: sub_d2f}
+    subf = {f: fou_sub_f, df: fou_sub_df, d2f: fou_sub_d2f}
     # series
 
     dus = Sum((e ** i / factorial(i)) * dusi[i], (i, 0, n)).doit()
@@ -142,7 +143,7 @@ for n in range(1, n_max+1):
             Upsilonp11 + conjugate(phip11) - (w1 - conjugate(w1)) * conjugate(dphip11)) * expoa - rhs1
     eqq1 = eqq1.subs(w1, x + I * e * f)
 
-    eqq1 = ser(eqq1, n + 1)
+    eqq1 = ser(eqq1, n + 1)  ####### checked with hands
 
     #
     # 3 - substitution
@@ -158,11 +159,11 @@ for n in range(1, n_max+1):
     # forming substitution
 
     for k in range(1, n + 1):
-        #sub_dus = (A[k, 1] + I * A[k, (-1)]) * cos(k * b * x) + (B[k, 1] + I * B[k, (-1)]) * sin(k * b * x) # for non-fourier series
+        # sub_dus = (A[k, 1] + I * A[k, (-1)]) * cos(k * b * x) + (B[k, 1] + I * B[k, (-1)]) * sin(k * b * x) # for non-fourier series
         sub_dus = 0
-        for k_f in range (1,n_fur+1):
-            sub_dus += (A[k, k_f] + I * A[k, (-k_f)]) * cos(k * b * x) + (B[k, k_f] + I * B[k, (-k_f)]) * sin(k * b * x)   ######## trig functions coeff shows approx order or fourier order?
-
+        for k_f in range(1, n_fur + 1):
+            sub_dus += (A[k, k_f] + I * A[k, (-k_f)]) * cos(k_f * b * x) + (B[k, k_f] + I * B[k, (-k_f)]) * sin(
+                k_f * b * x)  ######## here is trig coeffs set to for order
 
         subp[dusij[k, 0]] = sub_dus
         subp_dusd = sub_dus
@@ -171,7 +172,7 @@ for n in range(1, n_max+1):
             subp[dusij[k, l]] = subp_dusd
         subp[phip1ij1[k, 0]] = 0
         subp[Upsilonp1ij1[k, 0]] = 0
-        for l in range(1, n + 1):             ####### what about diff?
+        for l in range(1, n + 1):
             subp[phip1ij1[k, l]] = 0
             subp[Upsilonp1ij1[k, l]] = 0
 
@@ -184,47 +185,51 @@ for n in range(1, n_max+1):
     reqq1i = []
 
     for i in range(n):
-        reqq1i.append(eqq1l[i+1].subs(subp))                  ###### why use only current appr order? and skip 0 - from maple
+        reqq1i.append(eqq1l[i + 1].subs(subp))
         reqq1i[i] = reqq1i[i].subs(subf)
         reqq1i[i] = reqq1i[i].rewrite(exp(I * b * x))
         reqq1i[i] = reqq1i[i].expand()
-        print(reqq1i[i])
-        for j in range(1, n_fur + 1):
+
+        for j in range(n_fur, 0, -1):
             reqq1i[i] = reqq1i[i].subs(exp(-j * I * b * x), 1 / (t ** j))
             reqq1i[i] = reqq1i[i].subs(exp(j * I * b * x), t ** j)
 
-        reqq1i[i] = collect(reqq1i[i], t)
+        reqq1i[i] = collect(reqq1i[i], t)  ####### resulting equation seems like right but not 100% checked
 
     # potentials substitution
 
     subupsilon = [0]
-    for i in range(1,n+1):
-        subupsilon.append(reqq1i[i - 1].coeff(t, i) * exp(i * I * b * z))
+    for k in range(1, n + 1):
+        subupsilon.append(0)
+        for k_f in range(1, n_fur + 1):
+            subupsilon[k] += (reqq1i[k - 1].coeff(t, k_f) * exp(k_f * I * b * z))
 
     for i in range(1, n + 1):
         Upsilonp11 = Upsilonp11.subs(Upsilonp1ij1[i, 0], subupsilon[i])
         subupsilondiff = subupsilon[i]
-        for j in range(1,n_fur + 1):
+        for j in range(1, n + 1):
             subupsilondiff = diff(subupsilondiff, z)
             Upsilonp11 = Upsilonp11.subs(Upsilonp1ij1[i, j], subupsilondiff)
-    Upsilonp11 = Upsilonp11.subs(subp)
+    Upsilonp11 = Upsilonp11.subs(subp)  #####   checked manually
 
     subphii = [0]
-    for i in range(1, n + 1):
-        subphii.append(-1 * (reqq1i[i - 1].coeff(t, -i) * exp(-i * I * b * z)))
+    for k in range(1, n + 1):
+        subphii.append(0)
+        for k_f in range(1, n_fur + 1):
+            subphii[k] += (-1 * (reqq1i[k - 1].coeff(t, -k_f) * exp(-k_f * I * b * z)))
 
     for i in range(1, n + 1):
         phip11 = phip11.subs(phip1ij1[i, 0], subphii[i])
         subphidiff = subphii[i]
-        for j in range(1, n_fur + 1):
+        for j in range(1, n + 1):
             subphidiff = diff(subphidiff, z)
             phip11 = phip11.subs(phip1ij1[i, j], subphidiff)
-    phip11 = phip11.subs(subp)
+    phip11 = phip11.subs(subp)  #######  checked manually
 
     for i in range(1, n + 1):
         dphip11 = dphip11.subs(phip1ij1[i, 0], subphii[i])
         subphidiff = subphii[i]
-        for j in range(1, n_fur):  # n or n+1                           ######### to do
+        for j in range(1, n + 1):  # n or n+1
             subphidiff = diff(subphidiff, z)
             dphip11 = dphip11.subs(phip1ij1[i, j], subphidiff)
     dphip11 = dphip11.subs(subp)
@@ -265,12 +270,13 @@ for n in range(1, n_max+1):
 
     # eq
     qs = (sigmass0 * cr + Ms * cr * re(dus) + sigmas0 * im(d2us * expoa)) - I * (
-                Ms * re(d2us * expoa) - sigmas0 * cr * im(dus))
+            Ms * re(d2us * expoa) - sigmas0 * cr * im(dus))
+
     qs = ser(qs, n + 1)
 
     eqq4 = 2 * mu * dus - (ka + 1) * phip11 + qs
     eqq4 = eqq4.expand()
-    eqq4 = collect(eqq4, e)
+    eqq4 = collect(eqq4, e)  ###### checked manually
 
     # forming subs
     subsi = {dusij[0, 0]: ((ka + 1) * T / 4) / (2 * mu)}
@@ -279,10 +285,11 @@ for n in range(1, n_max+1):
         subsi[dusij[0, k]] = 0
 
     for k in range(1, n + 1):
-        #sub_dus = (A[k, 1] + I * A[k, (-1)]) * cos(k * b * x) + (B[k, 1] + I * B[k, (-1)]) * sin(k * b * x) # origin for non-fourier
+        # sub_dus = (A[k, 1] + I * A[k, (-1)]) * cos(k * b * x) + (B[k, 1] + I * B[k, (-1)]) * sin(k * b * x) # origin for non-fourier
         sub_dus = 0
-        for k_f in range(1,n_fur+1):
-            sub_dus += (A[k, k_f] + I * A[k, (-k_f)]) * cos(k * b * x) + (B[k, k_f] + I * B[k, (-k_f)]) * sin(k * b * x)
+        for k_f in range(1, n_fur + 1):
+            sub_dus += (A[k, k_f] + I * A[k, (-k_f)]) * cos(k_f * b * x) + (B[k, k_f] + I * B[k, (-k_f)]) * sin(
+                k_f * b * x)
         subsi[dusij[k, 0]] = sub_dus
         sub_dus_d = diff(sub_dus, x)
         for l in range(1, n + 1):
@@ -291,71 +298,104 @@ for n in range(1, n_max+1):
 
     # get equations to solve on next step
     eqq4l = [0]
-    coslist = []
+    # coslist = []
+
     for k in range(1, n + 1):
+
         eqq4l.append(eqq4.coeff(e, k))
         eqq4l[k] = eqq4l[k].subs(subf)
         eqq4l[k] = eqq4l[k].subs(subsi)
         eqq4l[k] = eqq4l[k].expand()
+        eqq4l[k] = eqq4l[k].rewrite(exp(I * b * x))
 
-        for l in range(n, 0, -1):
-            eqq4l[k] = eqq4l[k].subs(exp(l * I * b * x), 1 / (exp(-l * I * b * x)))
-            eqq4l[k] = eqq4l[k].subs(exp(-l * I * b * x), cos(l * b * x) - I * sin(l * b * x))
-        coslist.append(cos(k * b * x))
-        coslist.append(sin(k * b * x))
+        trig_sub = {}
+        for k_f in range(n_fur, 0, -1):
+            trig_sub[exp(-k_f * I * b * x)] = 1 / (t ** k_f)
+            trig_sub[exp(k_f * I * b * x)] = t ** k_f
+        eqq4l[k] = eqq4l[k].subs(trig_sub)
         eqq4l[k] = eqq4l[k].expand()
-        eqq4l[k] = eqq4l[k].collect(coslist)
+        eqq4l[k] = eqq4l[k].evalf()
+        eqq4l[k] = eqq4l[k].collect(t)
 
     eqslist = []
+
     for k in range(1, n + 1):
-        for l in range(1, n + 1):
-            eqslist.append([re(eqq4l[k].coeff(cos(l * b * x))), im(eqq4l[k].coeff(cos(l * b * x))),         ######## check coeffs in cos and sin
-                            re(eqq4l[k].coeff(sin(l * b * x))), im(eqq4l[k].coeff(sin(l * b * x)))])
+        cfc = [0]
+        cfs = [0]
+        for k_f in range(1, n_fur + 1):
+            cfc.append(eqq4l[k].coeff(t, k_f))
+            cfs.append(eqq4l[k].coeff(t, -k_f))
+
+        for k_f in range(1, n_fur + 1):
+            eqslist.append([re(cfc[k_f]), im(cfc[k_f]), re(cfs[k_f]), im(cfs[k_f])])
 
     #
     # 5 - get coeffs and stress components
     #
 
-    unkn = [0] # forming unknown coeffs matrix
+    unkn = []  # forming unknown coeffs matrix
 
-    for k in range(1, n + 1):
-        #unkn.append([A[k, 1], A[k, (-1)], B[k, 1], B[k, (-1)]]) # origin for non-fourier
-        unkn_fous = []
-        for k_f in range(1,n_fur+1):
-            unkn_fous.append(A[k, k_f])
-            unkn_fous.append(A[k, (-k_f)])
-            unkn_fous.append(B[k, k_f])
-            unkn_fous.append(B[k, (-k_f)])
-        unkn.append(unkn_fous)
+    # for k in range(1, n + 1):
+    #     # unkn.append([A[k, 1], A[k, (-1)], B[k, 1], B[k, (-1)]]) # origin for non-fourier
+    #
+    #     for k_f in range(1, n_fur + 1):
+    #         unkn.append(A[k, k_f])
+    #         unkn.append(A[k, (-k_f)])
+    #         unkn.append(B[k, k_f])
+    #         unkn.append(B[k, (-k_f)])
+
+    for k_f in range(1, n_fur + 1):
+        unkn.append(A[n, k_f])
+        unkn.append(A[n, (-k_f)])
+        unkn.append(B[n, k_f])
+        unkn.append(B[n, (-k_f)])
+
     par0 = {qs0: 0}
 
     # first subs parameters
     par1 = {b: 2 * pi / a, ka: 3 - 4 * (lam / (2 * (lam + mu))), x: x * a, nu: lam / (2 * (lam + mu))}
 
     # second subs - Ms; a; T; sigma
-    par2 = {lam: 58.17 * 10 ** 9, mu: 26.13 * 10 ** 9, Ms: 6.099, a: 10 * 10 ** (-9), T: 0.1 * 10 ** 9, sigmass0: 1,
+    par2 = {lam: 58.17 * 10 ** 9, mu: 26.13 * 10 ** 9, Ms: 6.099, a: 100 * 10 ** (-9), T: 0.1 * 10 ** 9, sigmass0: 1,
             sigmas0: 1}  # origin
 
     # solving equations
 
-    subc = {}  # coeffs
+    #subc = {}  # coeffs
 
-    for k in range(1, n + 1):
-        eqss = eqslist[(k - 1) + n * (k - 1)].copy()  ##
 
-        i = 0
-        for ex in eqss:
-            eqss[i] = ex.subs(par0)
-            eqss[i] = eqss[i].subs(par1)
-            eqss[i] = eqss[i].subs(subc)
-            eqss[i] = eqss[i].evalf(subs=par2)
+    # for kn in range(1, n + 1):
+    #     eqss = []
+    #     for k in range(1, n_fur + 1):
+    #         for kir in range(4):
+    #             cure = eqslist[(k - 1) + (kn - 1) * n_fur][kir]
+    #             cure = cure.subs(par0)
+    #             cure = cure.subs(par1)
+    #             cure = cure.subs(subc)
+    #             cure = cure.evalf(subs=par2)
+    #             eqss.append(cure)
+    #
+    #     sol0 = solve(eqss, unkn)
+    #
+    #     subc = subc | sol0
 
-            i += 1
-        sol0 = solve(eqss, unkn[k])
+    subc = subc_hist
+    eqss = []
+    for k in range(1, n_fur + 1):
+        for kir in range(4):
+            cure = eqslist[(k - 1) + (n - 1) * n_fur][kir]
+            cure = cure.subs(par0)
+            cure = cure.subs(par1)
+            cure = cure.subs(subc)
+            cure = cure.evalf(subs=par2)
+            eqss.append(cure)
 
-        subc = subc | sol0
+    sol0 = solve(eqss, unkn)
 
-    #subf = {f: sub_f, df: sub_df, d2f: sub_d2f}  # function and derivatives
+    subc = subc | sol0
+    print(subc)
+    subc_hist = subc
+    # subf = {f: sub_f, df: sub_df, d2f: sub_d2f}  # function and derivatives
     subf = {f: fou_sub_f, df: fou_sub_df, d2f: fou_sub_d2f}
 
     # subs into potentials
@@ -363,24 +403,24 @@ for n in range(1, n_max+1):
     Upsilonp11 = Upsilonp11.subs(subc)
     Upsilonp11 = Upsilonp11.subs(subf)
     Upsilonp11 = Upsilonp11.subs(par0)
-    Upsilonp11 = Upsilonp11.subs(par1)
-    Upsilonp11 = Upsilonp11.subs(par2)
+    #Upsilonp11 = Upsilonp11.subs(par1)
+    #Upsilonp11 = Upsilonp11.subs(par2)
     Upsilonp11 = Upsilonp11.evalf()
 
     phip11 = phip11.subs(z, x)
     phip11 = phip11.subs(subc)
     phip11 = phip11.subs(subf)
     phip11 = phip11.subs(par0)
-    phip11 = phip11.subs(par1)
-    phip11 = phip11.subs(par2)
+    #phip11 = phip11.subs(par1)
+    #phip11 = phip11.subs(par2)
     phip11 = phip11.evalf()
 
     dphip11 = dphip11.subs(z, x)
     dphip11 = dphip11.subs(subc)
     dphip11 = dphip11.subs(subf)
     dphip11 = dphip11.subs(par0)
-    dphip11 = dphip11.subs(par1)
-    dphip11 = dphip11.subs(par2)
+    #dphip11 = dphip11.subs(par1)
+    #dphip11 = dphip11.subs(par2)
     dphip11 = dphip11.evalf()
 
     expoa = 1 - 2 * I * e * df / (1 + I * e * df)  # get series
@@ -399,9 +439,7 @@ for n in range(1, n_max+1):
 
     G1 = G1.subs(w1, x + I * e * f)
     G1 = ser(G1, n + 1)
-    G1 = G1.subs(subf)
-    G1 = G1.subs(b, par1[b])
-    G1 = G1.subs(a, par2[a])
+
 
 
     sigma_1nn = re(G1).evalf()
@@ -410,27 +448,45 @@ for n in range(1, n_max+1):
 
     # G1 -> stress
 
-    sigmatt = sigma_1tt # for sigma tt
-    sigmann = sigma_1nn # for sigma nn
+    # sigmatt = sigma_1tt
+    # sigmatt = sigmatt.subs(e, ee * 0.01)
+    # sigmatt = sigmatt.subs(f, fou_sub_f)
+    # sigmatt = sigmatt.subs(df, fou_sub_df)
+    # sigmatt = sigmatt.subs(par1)
+    # sigmatt = sigmatt.subs(par2)
+    # scf = sigmatt.evalf(subs={x: 0})
 
-    scf = sigmatt.evalf(subs={x: 0})
+    sigmatt_base = sigma_1tt
+    sigmatt_base = sigmatt_base.subs(f, fou_sub_f)
+    sigmatt_base = sigmatt_base.subs(df, fou_sub_df)
+    sigmatt_base = sigmatt_base.subs(par1)
+    sigmatt_base = sigmatt_base.subs(par2)
 
-    sigmatt = sigmatt.subs(e, 0.1)
-    print(sigmatt)
-    plot(sigmatt, (x, -0.5, 0.5))
+    # sigmann_base = sigma_1nn
+    # sigmann_base = sigmann_base.subs(f, fou_sub_f)
+    # sigmann_base = sigmann_base.subs(df, fou_sub_df)
+    # sigmann_base = sigmann_base.subs(par1)
+    # sigmann_base = sigmann_base.subs(par2)
+
+
 
     # data saving and plotting
     xee = []
     xx = []
-    for ee in range(1, 20):
+    for ee in range(1, 11):
         # block for sigma tt
 
-        # sigmatt = sigmatt.subs(e, 0.1)
-        sigmatt = sigma_1tt
+
+
+        sigmatt = sigmatt_base
         sigmatt = sigmatt.subs(e, ee*0.01)
         scf = sigmatt.evalf(subs={x: 0})
 
         # block for sigma nn
+
+        # sigmann = sigmann_base
+        # sigmann = sigmann.subs(e, ee * 0.01)
+        # scf = sigmann.evalf(subs={x: 0})
 
         #sigmann = sigma_1nn
         #sigmann = sigmann.subs(e, ee * 0.01)
@@ -439,19 +495,19 @@ for n in range(1, n_max+1):
 
         xee.append(ee * 0.01)
         xx.append(scf)
-
+    print(scf)
     if s_data == []:
         s_data.append(xee)
     s_data.append(xx)
-    #plt.plot(xee, xx, label='$n={n}$'.format(n=n))
+    plt.plot(xee, xx, label='$n={n}$'.format(n=n))
 
 # data saving
 s_data = np.array(s_data)
-#np.savetxt("snn_n15_a100_sig0.csv", s_data, delimiter=",")
+np.savetxt("stt_fou_y2_n5_a100.csv", s_data, delimiter=",")
 
 
 #plt.title('snn_n15')
-#plt.legend(loc='best')
-#plt.show()
+plt.legend(loc='best')
+plt.show()
 
 
